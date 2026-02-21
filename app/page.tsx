@@ -2,6 +2,7 @@
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import Image from "next/image";
+import CountUp from "@/components/CountUp";
 
 function supabasePublic() {
   return createClient(
@@ -108,7 +109,7 @@ export default async function HomePage() {
           <div className="bg-white/70 backdrop-blur-xl border border-slate-100 rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-center items-center text-center transition-all hover:bg-white/90">
             <h3 className="text-slate-400 font-medium text-sm tracking-wider mb-2">ยอดบริจาครวม</h3>
             <div className="text-4xl md:text-5xl font-bold text-slate-800 mb-2">
-              {total.toLocaleString()}
+              <CountUp end={total} duration={2000} />
             </div>
             <span className="text-slate-400 font-medium">บาท</span>
           </div>

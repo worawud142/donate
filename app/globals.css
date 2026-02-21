@@ -22,6 +22,39 @@ body {
   }
 }
 
+@keyframes slideInBottom {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-up {
+  opacity: 0;
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.slide-in-bottom {
+  animation: slideInBottom 1.2s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.fade-in {
+  animation: fadeIn 1.5s ease-out both;
+}
+
 .animate-fade-up {
   opacity: 0;
   animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;

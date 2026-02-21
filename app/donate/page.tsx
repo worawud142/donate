@@ -57,9 +57,59 @@ export default function DonatePage() {
           <h1 className="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight leading-tight mb-3">
             ร่วมสมทบทุนสร้าง โดมอเนกประสงค์
           </h1>
-          <p className="text-slate-500 text-lg font-light leading-relaxed">
+          <p className="text-slate-500 text-lg font-light leading-relaxed mb-6">
             ขอขอบพระคุณทุกยอดบริจาค กรุณาแนบสลิปเพื่อให้แอดมินตรวจสอบความถูกต้อง
           </p>
+
+          {/* Bank Account Details Card */}
+          <div className="bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-100 rounded-2xl p-6 shadow-sm relative overflow-hidden">
+            <div className="absolute -right-6 -top-6 text-sky-100/50 w-32 h-32">
+              <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" />
+                <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center p-2 border border-slate-100">
+                  {/* Default Bank Icon, replace with actual bank logo if needed */}
+                  <svg className="w-8 h-8 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-slate-500 mb-1">บัญชีธนาคาร (ระบุธนาคาร)</div>
+                  <div className="text-lg font-semibold text-slate-800">ชื่อบัญชี: (ระบุชื่อบัญชี)</div>
+                  <div className="text-2xl font-bold text-sky-700 tracking-wider mt-1 font-mono">
+                    123-4-56789-0
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 w-full md:w-auto mt-2 md:mt-0">
+                <button
+                  onClick={async () => {
+                    await navigator.clipboard.writeText("1234567890");
+                    const btn = document.getElementById("copy-btn-text");
+                    if (btn) {
+                      const original = btn.innerText;
+                      btn.innerText = "คัดลอกแล้ว! ✅";
+                      setTimeout(() => (btn.innerText = original), 2000);
+                    }
+                  }}
+                  type="button"
+                  className="flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-full font-medium transition-all shadow-sm active:scale-95 whitespace-nowrap"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  <span id="copy-btn-text">คัดลอกเลขบัญชี</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <form onSubmit={onSubmit} className="bg-white/80 backdrop-blur-xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-6 md:p-10 space-y-6 transition-all hover:bg-white/90">
@@ -71,7 +121,7 @@ export default function DonatePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block mb-2 text-sm font-medium text-slate-600">รุ่นศิษย์เก่า (ตัวเลข)</label>
-              <input name="alumni_batch" inputMode="numeric" className={fieldClass} placeholder="เช่น 1, 15 (ถ้ามี)" />
+              <input name="alumni_batch" inputMode="numeric" className={fieldClass} placeholder="เช่น ปี 2550, ปี 2551 (ถ้ามี)" />
             </div>
 
             <div>
