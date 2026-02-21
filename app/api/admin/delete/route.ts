@@ -8,10 +8,12 @@ function bad(msg: string, status = 400) {
   return NextResponse.json({ ok: false, message: msg }, { status });
 }
 
+import { revalidatePath } from "next/cache";
+
 export async function POST(req: Request) {
   try {
     const { id } = await req.json();
-    
+
     if (!id) return bad("ไม่พบ ID รายการ");
 
     const supabase = supabaseService();
@@ -32,6 +34,12 @@ export async function POST(req: Request) {
     const { error } = await supabase.from("donations").delete().eq("id", id);
 
     if (error) return bad(`ลบรายการล้มเหลว: ${error.message}`, 500);
+
+    // Revalidate paths to clear Next.js cache
+    revalidatePath("/");
+    revalidatePath("/board");
+    revalidatePath("/donors");
+    revalidatePath("/admin/donors");
 
     return NextResponse.json({ ok: true, message: "ลบรายการสำเร็จ" });
   } catch (e: any) {

@@ -1,6 +1,7 @@
 // app/api/admin/update/route.ts
 import { NextResponse } from "next/server";
 import { supabaseService } from "@/lib/supabase-server";
+import { revalidatePath } from "next/cache";
 
 export const runtime = "nodejs";
 
@@ -11,7 +12,7 @@ function bad(msg: string, status = 400) {
 export async function POST(req: Request) {
   try {
     const item = await req.json();
-    
+
     if (!item.id) return bad("ไม่พบ ID รายการ");
 
     const supabase = supabaseService();
@@ -56,8 +57,14 @@ export async function POST(req: Request) {
 
     if (error) return bad(`อัปเดตรายการล้มเหลว: ${error.message}`, 500);
 
-    return NextResponse.json({ 
-      ok: true, 
+    // Revalidate paths to clear Next.js cache
+    revalidatePath("/");
+    revalidatePath("/board");
+    revalidatePath("/donors");
+    revalidatePath("/admin/donors");
+
+    return NextResponse.json({
+      ok: true,
       message: "อัปเดตรายการสำเร็จ",
       item: data
     });

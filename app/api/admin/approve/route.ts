@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "../_guard";
+import { revalidatePath } from "next/cache";
 
 export const runtime = "nodejs";
 
@@ -16,5 +17,11 @@ export async function POST(req: Request) {
     .single();
 
   if (error) return NextResponse.json({ ok: false, message: error.message }, { status: 500 });
+
+  revalidatePath("/");
+  revalidatePath("/board");
+  revalidatePath("/donors");
+  revalidatePath("/admin/donors");
+
   return NextResponse.json({ ok: true, item: data });
 }
