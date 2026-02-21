@@ -1,0 +1,199 @@
+// app/donate/page.tsx
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+export default function DonatePage() {
+  const [loading, setLoading] = useState(false);
+  const [ref, setRef] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [donationType, setDonationType] = useState<"transfer" | "cash">("transfer");
+  const fieldClass =
+    "w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-200";
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setRef(null);
+    setSuccessMessage(null);
+    setLoading(true);
+
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+
+    try {
+      const res = await fetch("/api/donate", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.message || "ส่งข้อมูลไม่สำเร็จ");
+      setRef(json.ref);
+      setSuccessMessage(json.message || "ส่งข้อมูลสำเร็จ");
+      form.reset();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen relative overflow-hidden bg-slate-50 font-sans p-6 md:p-10">
+      {/* Decorative blurred blobs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-200/40 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-100/30 blur-[100px] pointer-events-none" />
+
+      <div className="relative max-w-2xl mx-auto animate-fade-up">
+        <div className="mb-8">
+          <Link
+            href="/"
+            className="inline-flex items-center rounded-full bg-white px-5 py-2 text-sm font-medium text-slate-600 border border-slate-200 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:bg-slate-50 hover:text-slate-900 transition-all duration-300"
+          >
+            ← กลับหน้าแรก
+          </Link>
+        </div>
+
+        <div className="mb-10 text-center md:text-left">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight leading-tight mb-3">
+            ร่วมสมทบทุนสร้าง โดมอเนกประสงค์
+          </h1>
+          <p className="text-slate-500 text-lg font-light leading-relaxed">
+            ขอขอบพระคุณทุกยอดบริจาค กรุณาแนบสลิปเพื่อให้แอดมินตรวจสอบความถูกต้อง
+          </p>
+        </div>
+
+        <form onSubmit={onSubmit} className="bg-white/80 backdrop-blur-xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-6 md:p-10 space-y-6 transition-all hover:bg-white/90">
+          <div>
+            <label className="block mb-2 text-sm font-medium text-slate-600">ชื่อ-สกุล *</label>
+            <input name="full_name" required className={fieldClass} placeholder="เช่น นายใจดี มีน้ำใจ" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="block mb-2 text-sm font-medium text-slate-600">รุ่นศิษย์เก่า (ตัวเลข)</label>
+              <input name="alumni_batch" inputMode="numeric" className={fieldClass} placeholder="เช่น 1, 15 (ถ้ามี)" />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium text-slate-600">ประเภทผู้บริจาค *</label>
+              <select name="donor_type" className={fieldClass} defaultValue="alumni">
+                <option value="alumni">ศิษย์เก่า</option>
+                <option value="parent">ผู้ปกครอง</option>
+                <option value="organization">หน่วยงาน/ห้างร้าน</option>
+                <option value="public">ประชาชนทั่วไป</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block mb-2 text-sm font-medium text-slate-600">ทีม/แก๊ง (ถ้าไม่ใช่ศิษย์เก่า)</label>
+            <input name="team_name" className={fieldClass} placeholder="เช่น ทีมฟุตบอล, คณะวิศวกรรม, บริษัท ABC" />
+          </div>
+
+          <div>
+            <label className="block mb-2 text-sm font-medium text-slate-600">ประเภทการบริจาค *</label>
+            <div className="flex gap-4">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="donation_method"
+                  value="transfer"
+                  checked={donationType === "transfer"}
+                  onChange={(e) => setDonationType("transfer")}
+                  className="mr-2"
+                />
+                <span className="text-slate-700">โอนเงิน</span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="donation_method"
+                  value="cash"
+                  checked={donationType === "cash"}
+                  onChange={(e) => setDonationType("cash")}
+                  className="mr-2"
+                />
+                <span className="text-slate-700">เงินสด</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="block mb-2 text-sm font-medium text-slate-600">จำนวนเงิน (บาท) *</label>
+              <input name="amount" required inputMode="decimal" className={fieldClass} placeholder="เช่น 500" />
+            </div>
+            {donationType === "transfer" ? (
+              <div>
+                <label className="block mb-2 text-sm font-medium text-slate-600">วันที่โอน *</label>
+                <input name="transfer_date" required type="date" className={fieldClass} />
+              </div>
+            ) : (
+              <div>
+                <label className="block mb-2 text-sm font-medium text-slate-600">วันที่บริจาค *</label>
+                <input name="donation_date" required type="date" className={fieldClass} />
+              </div>
+            )}
+          </div>
+
+          {donationType === "transfer" && (
+            <div>
+              <label className="block mb-2 text-sm font-medium text-slate-600">ช่องทางโอน</label>
+              <input name="channel" className={fieldClass} placeholder="เช่น ธนาคารกสิกรไทย / พร้อมเพย์" />
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+            <div>
+              <label className="block mb-2 text-sm font-medium text-slate-600">เบอร์ติดต่อ (ไม่บังคับ)</label>
+              <input name="phone" className={fieldClass} placeholder="เช่น 081-xxx-xxxx" />
+            </div>
+            {donationType === "transfer" ? (
+              <div>
+                <label className="block mb-2 text-sm font-medium text-slate-600">แนบสลิป (JPG/PNG ≤ 5MB) *</label>
+                <input
+                  name="slip"
+                  required
+                  type="file"
+                  accept="image/*"
+                  className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 transition-all file:cursor-pointer cursor-pointer"
+                />
+              </div>
+            ) : (
+              <div>
+                <label className="block mb-2 text-sm font-medium text-slate-600">หมายเหตุ (ไม่บังคับ)</label>
+                <input name="cash_note" className={fieldClass} placeholder="เช่น บริจาคผ่านคุณครู/แอดมิน" />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block mb-2 text-sm font-medium text-slate-600">ข้อความถึงโรงเรียน (ไม่บังคับ)</label>
+            <textarea name="message" className={fieldClass} rows={3} placeholder="ความรู้ศึกดีๆ หรือคำอวยพร..." />
+          </div>
+
+          {error && <div className="text-red-600 bg-red-50 border border-red-100 p-4 rounded-xl text-sm">{error}</div>}
+          {ref && (
+            <div className="text-emerald-700 bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-sm">
+              ส่งข้อมูลสำเร็จ ✅ เลขอ้างอิง: <span className="font-semibold">{ref}</span>
+              <br /><span className="text-emerald-600 text-xs mt-1 block">{successMessage}</span>
+            </div>
+          )}
+
+          <div className="pt-4">
+            <button
+              disabled={loading}
+              className="w-full rounded-full bg-slate-900 hover:bg-slate-800 text-white disabled:opacity-60 disabled:cursor-not-allowed py-3.5 font-semibold shadow-[0_8px_20px_-6px_rgba(0,0,0,0.3)] transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 rounded-full border-2 border-slate-300 border-t-white animate-spin" /> กำลังส่งข้อมูล...
+                </span>
+              ) : "ส่งข้อมูลบริจาค"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

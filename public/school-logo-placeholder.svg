@@ -1,0 +1,12 @@
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="120" cy="120" r="116" fill="#FDE68A" stroke="#B45309" stroke-width="8"/>
+  <circle cx="120" cy="120" r="88" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="8"/>
+  <path d="M60 148L94 98L120 130L146 90L180 148H60Z" fill="#0EA5E9"/>
+  <rect x="56" y="148" width="128" height="18" rx="9" fill="#16A34A"/>
+  <text x="120" y="58" text-anchor="middle" font-size="22" font-family="sans-serif" font-weight="700" fill="#7E22CE">
+    โรงเรียน
+  </text>
+  <text x="120" y="200" text-anchor="middle" font-size="20" font-family="sans-serif" font-weight="700" fill="#7E22CE">
+    โลโก้ตัวอย่าง
+  </text>
+</svg>
