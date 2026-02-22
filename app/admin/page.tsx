@@ -118,7 +118,7 @@ export default function AdminPage() {
 
   async function deleteDonation(id: string) {
     if (!confirm("คุณต้องการลบรายการนี้ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้")) return;
-    
+
     setPendingId(id);
     setActionError(null);
     try {
@@ -148,7 +148,7 @@ export default function AdminPage() {
 
   async function saveEdit() {
     if (!editingItem || !token) return;
-    
+
     setPendingId(editingItem.id);
     setActionError(null);
     try {
@@ -171,13 +171,13 @@ export default function AdminPage() {
 
   async function viewSlip(slip_path: string) {
     if (!token) return;
-    
+
     // Check if this is a cash donation (no actual slip)
     if (slip_path === "cash_donation_no_slip") {
       setSlipUrl("cash_donation");
       return;
     }
-    
+
     const res = await fetch("/api/admin/signed-slip", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -207,9 +207,17 @@ export default function AdminPage() {
             <h1 className="text-3xl md:text-3xl font-bold text-slate-800 tracking-tight">ระบบแอดมิน (Admin Dashboard)</h1>
             <p className="text-slate-500 mt-2 text-sm">ตรวจสอบและอนุมัติรายการบริจาค</p>
           </div>
-          <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm text-sm text-slate-600 font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            {userEmail ? `${userEmail}` : "Not logged in"}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/ecard"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-sm text-sm font-semibold transition-colors"
+            >
+              <span className="text-lg">🖼️</span> สร้าง E-Card ขอบคุณ
+            </Link>
+            <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm text-sm text-slate-600 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              {userEmail ? `${userEmail}` : "Not logged in"}
+            </div>
           </div>
         </div>
 
@@ -355,7 +363,7 @@ export default function AdminPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold text-slate-800 mb-4">แก้ไขข้อมูลการบริจาค</h3>
-            
+
             {/* Display original info */}
             <div className="mb-4 p-3 bg-slate-50 rounded-lg">
               <div className="text-sm text-slate-600">
@@ -366,8 +374,8 @@ export default function AdminPage() {
                 <div className="flex justify-between mt-1">
                   <span>สถานะ:</span>
                   <span className="font-semibold">
-                    {editingItem.status === 'approved' ? 'อนุมัติแล้ว' : 
-                     editingItem.status === 'rejected' ? 'ปฏิเสธ' : 'รอตรวจสอบ'}
+                    {editingItem.status === 'approved' ? 'อนุมัติแล้ว' :
+                      editingItem.status === 'rejected' ? 'ปฏิเสธ' : 'รอตรวจสอบ'}
                   </span>
                 </div>
                 <div className="flex justify-between mt-1">
@@ -376,7 +384,7 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block mb-1 text-sm font-medium text-slate-600">ชื่อ-สกุล</label>
@@ -451,11 +459,10 @@ export default function AdminPage() {
                   onChange={(e) => setEditingItem({ ...editingItem, channel: e.target.value })}
                   placeholder="เช่น ธนาคารกสิกรไทย / พร้อมเพย์"
                   disabled={editingItem.slip_path === "cash_donation_no_slip"}
-                  className={`w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-200 ${
-                    editingItem.slip_path === "cash_donation_no_slip" 
-                      ? "bg-slate-100 text-slate-500 cursor-not-allowed" 
+                  className={`w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-200 ${editingItem.slip_path === "cash_donation_no_slip"
+                      ? "bg-slate-100 text-slate-500 cursor-not-allowed"
                       : "bg-slate-50"
-                  }`}
+                    }`}
                 />
                 {editingItem.slip_path === "cash_donation_no_slip" && (
                   <p className="text-xs text-slate-500 mt-1">การบริจาคเงินสดไม่มีช่องทางโอน</p>
