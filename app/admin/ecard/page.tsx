@@ -31,6 +31,9 @@ export default function AdminECardPage() {
     // Status flags for the image generation
     const [isGenerating, setIsGenerating] = useState(false);
 
+    // Toggle for showing batch
+    const [showBatch, setShowBatch] = useState(true);
+
     const ecardRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
@@ -92,7 +95,7 @@ export default function AdminECardPage() {
     const ecardData: ECardData | null = selectedDonation ? {
         fullName: selectedDonation.full_name,
         amount: selectedDonation.amount,
-        batch: selectedDonation.alumni_batch,
+        batch: showBatch ? selectedDonation.alumni_batch : null,
         teamName: selectedDonation.team_name,
     } : null;
 
@@ -182,10 +185,23 @@ export default function AdminECardPage() {
 
                         {/* Right side: Preview and Download */}
                         <div className="rounded-3xl bg-white/80 backdrop-blur-xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 flex flex-col h-[75vh]">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                                    <span className="text-xl">🖼️</span> ดูตัวอย่างและดาวน์โหลด E-Card
-                                </h2>
+                            <div className="flex justify-between items-start mb-6">
+                                <div>
+                                    <h2 className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                                        <span className="text-xl">🖼️</span> ดูตัวอย่างและดาวน์โหลด E-Card
+                                    </h2>
+                                    {selectedDonation && (
+                                        <label className="flex items-center gap-2 mt-3 text-sm font-medium text-slate-600 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={showBatch}
+                                                onChange={(e) => setShowBatch(e.target.checked)}
+                                                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            แสดงรุ่นศิษย์เก่าบนป้าย
+                                        </label>
+                                    )}
+                                </div>
                                 {selectedDonation && (
                                     <button
                                         onClick={handleDownload}
