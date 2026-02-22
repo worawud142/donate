@@ -111,24 +111,24 @@ export default function BoardDisplay({
                         {/* Floating glow inside the card */}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-yellow-500/10 blur-[60px] rounded-full pointer-events-none" />
 
-                        <div className={`z-10 font-bold w-full px-2 sm:px-0 text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-yellow-200 to-amber-100 drop-shadow-[0_2px_10px_rgba(253,224,71,0.2)] text-center break-words break-all leading-tight ${isFullscreen ? 'text-4xl md:text-6xl lg:text-[6rem] pb-8' : 'text-[1.35rem] leading-snug sm:text-3xl md:text-5xl lg:text-[5rem] pb-3 sm:pb-6'}`}>
+                        <div className={`z-10 font-bold w-full px-2 sm:px-0 text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-yellow-200 to-amber-100 drop-shadow-[0_2px_10px_rgba(253,224,71,0.2)] text-center break-words break-all leading-tight ${isFullscreen ? 'text-4xl md:text-6xl lg:text-[6rem] pb-8' : 'text-xl leading-snug sm:text-3xl md:text-5xl lg:text-[5rem] pb-2 sm:pb-6'}`}>
                             {selectedLabel}
                         </div>
 
-                        <div className={`z-10 flex items-baseline justify-center gap-2 sm:gap-4 md:gap-8 ${isFullscreen ? 'pb-8' : 'pb-2 sm:pb-4'}`}>
-                            <div className={`font-semibold text-amber-200/80 tracking-widest uppercase transition-all ${isFullscreen ? 'text-2xl md:text-4xl lg:text-5xl' : 'text-xs sm:text-sm md:text-2xl lg:text-3xl'}`}>
+                        <div className={`z-10 flex flex-wrap items-baseline justify-center gap-1 sm:gap-4 md:gap-8 w-full px-2 ${isFullscreen ? 'pb-8' : 'pb-2 sm:pb-4'}`}>
+                            <div className={`font-semibold text-amber-200/80 tracking-widest uppercase transition-all shrink-0 ${isFullscreen ? 'text-2xl md:text-4xl lg:text-5xl' : 'text-[10px] sm:text-sm md:text-2xl lg:text-3xl'}`}>
                                 จำนวน
                             </div>
-                            <div className={`font-black tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_10px_30px_rgba(234,179,8,0.3)] transition-all ${isFullscreen ? 'text-5xl sm:text-7xl md:text-[8rem] lg:text-[10rem]' : 'text-3xl sm:text-5xl md:text-7xl lg:text-[8rem]'}`}>
+                            <div className={`font-black tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_10px_30px_rgba(234,179,8,0.3)] transition-all min-w-0 ${isFullscreen ? 'text-5xl sm:text-7xl md:text-[8rem] lg:text-[10rem]' : 'text-3xl sm:text-5xl md:text-7xl lg:text-[8rem] truncate'}`}>
                                 <CountUp end={selectedTotal} duration={2500} />
                             </div>
-                            <div className={`font-semibold text-amber-200/80 tracking-widest uppercase transition-all ${isFullscreen ? 'text-2xl md:text-4xl lg:text-5xl' : 'text-xs sm:text-sm md:text-2xl lg:text-3xl'}`}>
+                            <div className={`font-semibold text-amber-200/80 tracking-widest uppercase transition-all shrink-0 ${isFullscreen ? 'text-2xl md:text-4xl lg:text-5xl' : 'text-[10px] sm:text-sm md:text-2xl lg:text-3xl'}`}>
                                 บาท
                             </div>
                         </div>
 
                         {selectedTeam && (
-                            <div className={`z-10 font-medium text-amber-100/70 tracking-wide text-center mt-2 sm:mt-4 ${isFullscreen ? 'text-xl md:text-3xl' : 'text-[10px] sm:text-xs md:text-lg'}`}>
+                            <div className={`z-10 font-medium text-amber-100/70 tracking-wide text-center mt-1 sm:mt-4 px-2 w-full break-words ${isFullscreen ? 'text-xl md:text-3xl' : 'text-[9px] sm:text-xs md:text-lg'}`}>
                                 ระดมทุนโดย: {selectedTeam}
                             </div>
                         )}
