@@ -58,7 +58,7 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
             </div>
 
             {/* --- Logo Space --- */}
-            <div className="relative z-10 mt-12 mb-6">
+            <div className="relative z-10 mt-8 mb-4">
                 <div className="relative w-[220px] h-[220px] rounded-full border-[8px] border-white shadow-xl bg-white overflow-hidden flex items-center justify-center">
                     <Image
                         src={logoSrc}
@@ -70,25 +70,25 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
             </div>
 
             {/* --- Main Content (The Glass/White Card) --- */}
-            <div className="relative z-10 w-[90%] bg-white/95 backdrop-blur-sm rounded-[3rem] shadow-2xl border-4 border-yellow-400/30 p-12 text-center mb-8 flex flex-col items-center">
-                <h3 className="text-3xl font-bold text-slate-800 mb-6">ขอขอบพระคุณ</h3>
+            <div className="relative z-10 w-[90%] bg-white/95 backdrop-blur-sm rounded-[3rem] shadow-2xl border-4 border-yellow-400/30 p-8 text-center mb-4 flex flex-col items-center">
+                <h3 className="text-3xl font-bold text-slate-800 mb-4">ขอขอบพระคุณ</h3>
 
-                <div className="text-6xl font-black text-blue-900 mb-4 tracking-tight drop-shadow-sm min-h-[80px]">
+                <div className="text-6xl font-black text-blue-900 mb-2 tracking-tight drop-shadow-sm min-h-[80px]">
                     {data.fullName}
                     {data.batch && <span className="text-4xl text-blue-800/80 ml-4 font-bold">(รุ่น {data.batch})</span>}
                 </div>
 
                 {data.teamName && (
-                    <div className="text-2xl font-bold text-slate-600 mb-6 border-b-2 border-slate-100 pb-4 inline-block px-8">
+                    <div className="text-2xl font-bold text-slate-600 mb-4 border-b-2 border-slate-100 pb-2 inline-block px-8">
                         {data.teamName}
                     </div>
                 )}
 
-                <div className="text-3xl font-medium text-slate-700 mb-6 mt-4">
+                <div className="text-3xl font-medium text-slate-700 mb-4 mt-2">
                     ที่ร่วมบริจาคสมทบทุนการศึกษาในครั้งนี้
                 </div>
 
-                <div className="flex items-center justify-center gap-6 mt-4 mb-10 bg-blue-50/50 py-6 px-16 rounded-3xl border border-blue-100">
+                <div className="flex items-center justify-center gap-6 mt-2 mb-6 bg-blue-50/50 py-4 px-16 rounded-3xl border border-blue-100">
                     <div className="text-4xl font-bold text-slate-600">จำนวนเงิน</div>
                     <div className="text-[5.5rem] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-600 drop-shadow-sm">
                         {data.amount.toLocaleString("th-TH")}
