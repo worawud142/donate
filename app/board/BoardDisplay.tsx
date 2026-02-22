@@ -106,12 +106,12 @@ export default function BoardDisplay({
                 </div>
 
                 {/* Center Section: Glassmorphism Data Card */}
-                <div className="flex-1 flex flex-col justify-center items-center w-full pointer-events-none mt-4 sm:mt-6 md:mt-0">
-                    <div className={`relative w-full max-w-7xl mx-auto rounded-3xl sm:rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)] flex flex-col items-center justify-center transition-all ${isFullscreen ? 'py-16 md:py-24 px-8 mt-8' : 'py-6 sm:py-8 md:py-12 px-4 sm:px-8 mt-2'}`}>
+                <div className="flex-1 flex flex-col justify-center items-center w-full pointer-events-none mt-4 sm:mt-6 md:mt-0 min-h-[16rem]">
+                    <div className={`relative w-full max-w-7xl mx-auto rounded-3xl sm:rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)] flex flex-col items-center justify-center transition-all ${isFullscreen ? 'py-16 md:py-24 px-8 mt-8' : 'py-4 sm:py-8 md:py-12 px-3 sm:px-8 mt-2'}`}>
                         {/* Floating glow inside the card */}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-yellow-500/10 blur-[60px] rounded-full pointer-events-none" />
 
-                        <div className={`z-10 font-bold w-full px-2 sm:px-0 text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-yellow-200 to-amber-100 drop-shadow-[0_2px_10px_rgba(253,224,71,0.2)] text-center break-words break-all leading-tight ${isFullscreen ? 'text-4xl md:text-6xl lg:text-[6rem] pb-8' : 'text-2xl sm:text-3xl md:text-5xl lg:text-[5rem] pb-4 sm:pb-6'}`}>
+                        <div className={`z-10 font-bold w-full px-2 sm:px-0 text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-yellow-200 to-amber-100 drop-shadow-[0_2px_10px_rgba(253,224,71,0.2)] text-center break-words break-all leading-tight ${isFullscreen ? 'text-4xl md:text-6xl lg:text-[6rem] pb-8' : 'text-[1.35rem] leading-snug sm:text-3xl md:text-5xl lg:text-[5rem] pb-3 sm:pb-6'}`}>
                             {selectedLabel}
                         </div>
 
@@ -119,7 +119,7 @@ export default function BoardDisplay({
                             <div className={`font-semibold text-amber-200/80 tracking-widest uppercase transition-all ${isFullscreen ? 'text-2xl md:text-4xl lg:text-5xl' : 'text-xs sm:text-sm md:text-2xl lg:text-3xl'}`}>
                                 จำนวน
                             </div>
-                            <div className={`font-black tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_10px_30px_rgba(234,179,8,0.3)] transition-all ${isFullscreen ? 'text-5xl sm:text-7xl md:text-[8rem] lg:text-[10rem]' : 'text-4xl sm:text-5xl md:text-7xl lg:text-[8rem]'}`}>
+                            <div className={`font-black tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_10px_30px_rgba(234,179,8,0.3)] transition-all ${isFullscreen ? 'text-5xl sm:text-7xl md:text-[8rem] lg:text-[10rem]' : 'text-3xl sm:text-5xl md:text-7xl lg:text-[8rem]'}`}>
                                 <CountUp end={selectedTotal} duration={2500} />
                             </div>
                             <div className={`font-semibold text-amber-200/80 tracking-widest uppercase transition-all ${isFullscreen ? 'text-2xl md:text-4xl lg:text-5xl' : 'text-xs sm:text-sm md:text-2xl lg:text-3xl'}`}>
