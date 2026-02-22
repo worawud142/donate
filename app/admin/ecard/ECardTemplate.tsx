@@ -46,8 +46,8 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
 
             {/* --- Top Header / Purpose --- */}
             <div className="relative z-10 w-full pt-16 px-12 text-center text-white drop-shadow-md">
-                <h2 className="text-3xl font-medium tracking-wide mb-2 opacity-90">
-                    ขอเชิญร่วมงาน "ตุ้มโฮมศิษย์เก่า ครั้งที่ 3"
+                <h2 className="text-4xl font-semibold tracking-wide mb-2 opacity-95">
+                    "ตุ้มโฮมศิษย์เก่า ครั้งที่ 3"
                 </h2>
                 <h1 className="text-4xl font-bold tracking-tight mb-2 text-yellow-300 drop-shadow-lg">
                     เพื่อสมทบทุนสร้างโดมอเนกประสงค์
@@ -96,9 +96,8 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
                     <div className="text-4xl font-bold text-slate-600">บาท</div>
                 </div>
 
-                <div className="text-2xl font-medium text-slate-700 leading-relaxed max-w-3xl mx-auto px-4">
-                    ขอให้ท่านและครอบครัวจงประสบแต่ความสุข ความเจริญ ด้วยอายุ วรรณะ สุขะ พละ ปฏิภาณ
-                    ธนสารสมบัติ ทุกประการเทอญ
+                <div className="text-2xl font-medium text-slate-700 leading-relaxed max-w-4xl mx-auto px-4 mt-2">
+                    ขอให้ท่านและครอบครัวจงประสบแต่ความสุข ความเจริญ ด้วยอายุ วรรณะ สุขะ พละ ปฏิภาณ ธนสารสมบัติ ทุกประการเทอญ
                 </div>
             </div>
 
