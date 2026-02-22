@@ -75,26 +75,26 @@ export default function BoardDisplay({
                 <div className="absolute top-1/2 left-1/6 w-1 h-1 bg-amber-100 rounded-full shadow-[0_0_10px_#fef3c7] animate-[ping_4.5s_infinite_1.5s]" />
             </div>
 
-            <div className={`relative z-10 flex h-full flex-col justify-between w-full mx-auto ${isFullscreen ? 'p-12 md:p-24 lg:p-32 max-w-[140rem]' : 'p-6 md:p-8 lg:p-12'}`}>
+            <div className={`relative z-10 flex h-full flex-col justify-between w-full mx-auto ${isFullscreen ? 'p-12 md:p-24 lg:p-32 max-w-[140rem]' : 'p-3 sm:p-6 md:p-8 lg:p-12'}`}>
                 {/* Top Section: Headers and Logo */}
-                <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
-                    <div className="text-center md:text-left w-full md:w-auto mt-2 md:mt-0 order-2 md:order-1 slide-in-bottom">
-                        <h1 className={`font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-50 to-slate-300 drop-shadow-[0_2px_10px_rgba(255,255,255,0.2)] transition-all ${isFullscreen ? 'text-4xl md:text-6xl lg:text-7xl mt-4 leading-tight' : 'mt-0.5 sm:mt-1 text-2xl sm:text-3xl md:text-4xl lg:text-5xl max-w-[80vw] truncate md:overflow-visible md:whitespace-normal'}`}>
+                <div className="flex items-start justify-between gap-2 sm:gap-4 flex-row">
+                    <div className="text-left w-auto mt-0 order-1 slide-in-bottom">
+                        <h1 className={`font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-50 to-slate-300 drop-shadow-[0_2px_10px_rgba(255,255,255,0.2)] transition-all ${isFullscreen ? 'text-4xl md:text-6xl lg:text-7xl mt-4 leading-tight' : 'mt-0 text-xs sm:text-2xl md:text-4xl lg:text-5xl max-w-[80vw] truncate md:overflow-visible md:whitespace-normal'}`}>
                             ตุ้มโฮมศิษย์เก่า ปีที่ 3
                         </h1>
-                        <h2 className={`font-medium text-blue-200 tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] transition-all ${isFullscreen ? 'text-xl md:text-3xl lg:text-4xl mt-4' : 'mt-1 md:mt-2 text-xs sm:text-sm md:text-lg lg:text-xl max-w-[85vw] truncate md:overflow-visible md:whitespace-normal'}`}>
+                        <h2 className={`font-medium text-blue-200 tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] transition-all ${isFullscreen ? 'text-xl md:text-3xl lg:text-4xl mt-4' : 'mt-0 md:mt-2 text-[8px] sm:text-sm md:text-lg lg:text-xl max-w-[85vw] truncate md:overflow-visible md:whitespace-normal'}`}>
                             สานต่อศรัทธา เติมเต็มโดม สร้างโอกาสทางการศึกษา
                         </h2>
-                        <div className={`font-light text-slate-300 tracking-wider uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] transition-all ${isFullscreen ? 'text-lg md:text-xl lg:text-2xl mt-4 opacity-70' : 'mt-1 text-[10px] sm:text-xs md:text-sm lg:text-base opacity-60'}`}>
+                        <div className={`font-light text-slate-300 tracking-wider uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] transition-all ${isFullscreen ? 'text-lg md:text-xl lg:text-2xl mt-4 opacity-70' : 'mt-0 text-[6px] sm:text-xs md:text-sm lg:text-base opacity-60'}`}>
                             โรงเรียนบ้านขัวก่าย
                         </div>
                     </div>
 
-                    <div className="relative group/logo self-center md:self-start order-1 md:order-2 mt-2 md:mt-0 shrink-0 fade-in">
+                    <div className="relative group/logo self-start order-2 shrink-0 fade-in">
                         {/* Elegant Logo Glow */}
                         <div className="absolute inset-0 bg-white rounded-full blur-2xl opacity-20 animate-[pulse_4s_inifnite] transition-opacity duration-700 group-hover/logo:opacity-40" />
 
-                        <div className={`relative rounded-full border border-white/30 bg-white/5 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_0_0_1px_rgba(255,255,255,0.1)] transition-transform hover:scale-105 duration-700 flex items-center justify-center overflow-hidden ${isFullscreen ? 'p-2 mb-4 w-[140px] h-[140px] md:w-[180px] md:h-[180px]' : 'p-1 w-[60px] h-[60px] sm:w-[72px] sm:h-[72px] md:w-[84px] md:h-[84px] lg:w-[100px] lg:h-[100px]'}`}>
+                        <div className={`relative rounded-full border border-white/30 bg-white/5 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_0_0_1px_rgba(255,255,255,0.1)] transition-transform hover:scale-105 duration-700 flex items-center justify-center overflow-hidden ${isFullscreen ? 'p-2 mb-4 w-[140px] h-[140px] md:w-[180px] md:h-[180px]' : 'p-0.5 sm:p-1 w-[32px] h-[32px] sm:w-[60px] sm:h-[60px] md:w-[84px] md:h-[84px] lg:w-[100px] lg:h-[100px]'}`}>
                             <Image
                                 src={logoSrc}
                                 alt="โลโก้โรงเรียน"
@@ -106,29 +106,29 @@ export default function BoardDisplay({
                 </div>
 
                 {/* Center Section: Glassmorphism Data Card */}
-                <div className="flex-1 flex flex-col justify-center items-center w-full pointer-events-none mt-4 sm:mt-6 md:mt-0 min-h-[16rem]">
-                    <div className={`relative w-full max-w-7xl mx-auto rounded-3xl sm:rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)] flex flex-col items-center justify-center transition-all ${isFullscreen ? 'py-16 md:py-24 px-8 mt-8' : 'py-4 sm:py-8 md:py-12 px-3 sm:px-8 mt-2'}`}>
+                <div className="flex-1 flex flex-col justify-center items-center w-full pointer-events-none mt-2 sm:mt-6 md:mt-0 min-h-0">
+                    <div className={`relative w-full max-w-7xl mx-auto rounded-2xl sm:rounded-3xl lg:rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)] flex flex-col items-center justify-center transition-all ${isFullscreen ? 'py-16 md:py-24 px-8 mt-8' : 'py-1.5 sm:py-6 md:py-12 px-2 sm:px-8 mt-1'}`}>
                         {/* Floating glow inside the card */}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-yellow-500/10 blur-[60px] rounded-full pointer-events-none" />
 
-                        <div className={`z-10 font-bold w-full px-2 sm:px-0 text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-yellow-200 to-amber-100 drop-shadow-[0_2px_10px_rgba(253,224,71,0.2)] text-center break-words break-all leading-tight ${isFullscreen ? 'text-4xl md:text-6xl lg:text-[6rem] pb-8' : 'text-xl leading-snug sm:text-3xl md:text-5xl lg:text-[5rem] pb-2 sm:pb-6'}`}>
+                        <div className={`z-10 font-bold w-full px-1 sm:px-0 text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-yellow-200 to-amber-100 drop-shadow-[0_2px_10px_rgba(253,224,71,0.2)] text-center break-words break-all leading-tight ${isFullscreen ? 'text-4xl md:text-6xl lg:text-[6rem] pb-8' : 'text-sm sm:text-2xl md:text-5xl lg:text-[5rem] pb-1 sm:pb-4 lg:pb-6'}`}>
                             {selectedLabel}
                         </div>
 
-                        <div className={`z-10 flex flex-wrap items-baseline justify-center gap-1 sm:gap-4 md:gap-8 w-full px-2 ${isFullscreen ? 'pb-8' : 'pb-2 sm:pb-4'}`}>
-                            <div className={`font-semibold text-amber-200/80 tracking-widest uppercase transition-all shrink-0 ${isFullscreen ? 'text-2xl md:text-4xl lg:text-5xl' : 'text-[10px] sm:text-sm md:text-2xl lg:text-3xl'}`}>
+                        <div className={`z-10 flex flex-nowrap sm:flex-wrap items-baseline justify-center gap-1 sm:gap-4 md:gap-8 w-full px-1 ${isFullscreen ? 'pb-8' : 'pb-1 sm:pb-4'}`}>
+                            <div className={`font-semibold text-amber-200/80 tracking-widest uppercase transition-all shrink-0 ${isFullscreen ? 'text-2xl md:text-4xl lg:text-5xl' : 'text-[8px] sm:text-sm md:text-2xl lg:text-3xl'}`}>
                                 จำนวน
                             </div>
-                            <div className={`font-black tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_10px_30px_rgba(234,179,8,0.3)] transition-all min-w-0 ${isFullscreen ? 'text-5xl sm:text-7xl md:text-[8rem] lg:text-[10rem]' : 'text-3xl sm:text-5xl md:text-7xl lg:text-[8rem] truncate'}`}>
+                            <div className={`font-black tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_10px_30px_rgba(234,179,8,0.3)] transition-all min-w-0 ${isFullscreen ? 'text-5xl sm:text-7xl md:text-[8rem] lg:text-[10rem]' : 'text-lg sm:text-4xl md:text-7xl lg:text-[8rem] truncate'}`}>
                                 <CountUp end={selectedTotal} duration={2500} />
                             </div>
-                            <div className={`font-semibold text-amber-200/80 tracking-widest uppercase transition-all shrink-0 ${isFullscreen ? 'text-2xl md:text-4xl lg:text-5xl' : 'text-[10px] sm:text-sm md:text-2xl lg:text-3xl'}`}>
+                            <div className={`font-semibold text-amber-200/80 tracking-widest uppercase transition-all shrink-0 ${isFullscreen ? 'text-2xl md:text-4xl lg:text-5xl' : 'text-[8px] sm:text-sm md:text-2xl lg:text-3xl'}`}>
                                 บาท
                             </div>
                         </div>
 
                         {selectedTeam && (
-                            <div className={`z-10 font-medium text-amber-100/70 tracking-wide text-center mt-1 sm:mt-4 px-2 w-full break-words ${isFullscreen ? 'text-xl md:text-3xl' : 'text-[9px] sm:text-xs md:text-lg'}`}>
+                            <div className={`z-10 font-medium text-amber-100/70 tracking-wide text-center mt-0.5 sm:mt-2 px-1 w-full break-words ${isFullscreen ? 'text-xl md:text-3xl' : 'text-[6px] sm:text-[10px] md:text-lg'}`}>
                                 ระดมทุนโดย: {selectedTeam}
                             </div>
                         )}
