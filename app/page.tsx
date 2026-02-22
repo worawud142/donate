@@ -150,14 +150,14 @@ export default async function HomePage() {
             ) : (
               <ul className="space-y-3">
                 {topBatches.map(([batch, sum], index) => (
-                  <li key={batch} className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-100 hover:shadow-sm transition-all group">
-                    <div className="flex items-center gap-4">
-                      <span className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold ${index === 0 ? 'bg-amber-100 text-amber-600' : index === 1 ? 'bg-slate-100 text-slate-500' : index === 2 ? 'bg-orange-100 text-orange-500' : 'bg-slate-50 text-slate-400'}`}>
+                  <li key={batch} className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-100 hover:shadow-sm transition-all group gap-2">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <span className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold ${index === 0 ? 'bg-amber-100 text-amber-600' : index === 1 ? 'bg-slate-100 text-slate-500' : index === 2 ? 'bg-orange-100 text-orange-500' : 'bg-slate-50 text-slate-400'}`}>
                         {index + 1}
                       </span>
-                      <span className="font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">รุ่น {batch}</span>
+                      <span className="font-semibold text-slate-700 group-hover:text-slate-900 transition-colors truncate">รุ่น {batch}</span>
                     </div>
-                    <span className="font-bold text-slate-800">{sum.toLocaleString()} บาท</span>
+                    <span className="font-bold text-slate-800 shrink-0 whitespace-nowrap">{sum.toLocaleString()} บาท</span>
                   </li>
                 ))}
               </ul>
@@ -179,17 +179,17 @@ export default async function HomePage() {
               <div className="flex-1">
                 <ul className="space-y-4">
                   {(donations || []).slice(0, 5).map((d: any, idx: number) => (
-                    <li key={idx} className="flex items-center justify-between border-b border-slate-100 last:border-0 pb-4 last:pb-0">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-sm uppercase">
+                    <li key={idx} className="flex items-center justify-between border-b border-slate-100 last:border-0 pb-4 last:pb-0 gap-2">
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="shrink-0 w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-sm uppercase">
                           {d.full_name?.charAt(0) || '?'}
                         </div>
-                        <div>
-                          <p className="font-medium text-slate-800 truncate max-w-[150px] sm:max-w-[200px]">{d.full_name}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium text-slate-800 truncate">{d.full_name}</p>
                           <p className="text-xs text-slate-400 mt-0.5">{new Date(d.created_at).toLocaleDateString('th-TH')}</p>
                         </div>
                       </div>
-                      <span className="font-semibold text-slate-700">{Number(d.amount).toLocaleString()} ฿</span>
+                      <span className="font-semibold text-slate-700 shrink-0 whitespace-nowrap">{Number(d.amount).toLocaleString()} ฿</span>
                     </li>
                   ))}
                 </ul>

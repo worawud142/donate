@@ -111,7 +111,7 @@ export default function BoardDisplay({
                         {/* Floating glow inside the card */}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-yellow-500/10 blur-[60px] rounded-full pointer-events-none" />
 
-                        <div className={`z-10 font-bold max-w-full text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-yellow-200 to-amber-100 drop-shadow-[0_2px_10px_rgba(253,224,71,0.2)] text-center break-words leading-tight ${isFullscreen ? 'text-4xl md:text-6xl lg:text-[6rem] pb-8' : 'text-2xl sm:text-3xl md:text-5xl lg:text-[5rem] pb-4 sm:pb-6'}`}>
+                        <div className={`z-10 font-bold w-full px-2 sm:px-0 text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-yellow-200 to-amber-100 drop-shadow-[0_2px_10px_rgba(253,224,71,0.2)] text-center break-words break-all leading-tight ${isFullscreen ? 'text-4xl md:text-6xl lg:text-[6rem] pb-8' : 'text-2xl sm:text-3xl md:text-5xl lg:text-[5rem] pb-4 sm:pb-6'}`}>
                             {selectedLabel}
                         </div>
 

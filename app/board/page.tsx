@@ -189,9 +189,9 @@ export default async function BoardPage({ searchParams }: BoardPageProps) {
                 ) : (
                   <div className="mt-4 grid grid-cols-1 gap-2 md:grid-cols-2">
                     {batchRows.slice(0, 12).map(([batch, amount], idx) => (
-                      <div key={batch} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                        <div className="font-medium text-slate-800">{idx + 1}. รุ่น {batch}</div>
-                        <div className="font-semibold text-slate-900">{amount.toLocaleString("th-TH")} บาท</div>
+                      <div key={batch} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 gap-2">
+                        <div className="font-medium text-slate-800 min-w-0 truncate">{idx + 1}. รุ่น {batch}</div>
+                        <div className="font-semibold text-slate-900 shrink-0 whitespace-nowrap">{amount.toLocaleString("th-TH")} บาท</div>
                       </div>
                     ))}
                   </div>
@@ -201,12 +201,12 @@ export default async function BoardPage({ searchParams }: BoardPageProps) {
               ) : (
                 <div className="mt-4 grid grid-cols-1 gap-2 md:grid-cols-2">
                   {donorRows.slice(0, 12).map((donor, idx) => (
-                    <div key={donor.name} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                      <div className="font-medium text-slate-800">
+                    <div key={donor.name} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 gap-2">
+                      <div className="font-medium text-slate-800 min-w-0 truncate">
                         {idx + 1}. {donor.name}
                         {donor.mainBatch ? ` (รุ่น ${donor.mainBatch})` : ""}
                       </div>
-                      <div className="font-semibold text-slate-900">{donor.total.toLocaleString("th-TH")} บาท</div>
+                      <div className="font-semibold text-slate-900 shrink-0 whitespace-nowrap">{donor.total.toLocaleString("th-TH")} บาท</div>
                     </div>
                   ))}
                 </div>
