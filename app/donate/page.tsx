@@ -80,10 +80,10 @@ export default function DonatePage() {
                   </svg>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-slate-500 mb-1">บัญชีธนาคาร (ระบุธนาคาร)</div>
-                  <div className="text-lg font-semibold text-slate-800">ชื่อบัญชี: (ระบุชื่อบัญชี)</div>
+                  <div className="text-sm font-medium text-slate-500 mb-1">บัญชีธนาคาร (ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร)</div>
+                  <div className="text-lg font-semibold text-slate-800">ชื่อบัญชี: ( ผ้าป่าเพื่อการศึกษาโรงเรียนบ้านขัวก่าย)</div>
                   <div className="text-2xl font-bold text-sky-700 tracking-wider mt-1 font-mono">
-                    123-4-56789-0
+                    020230032103
                   </div>
                 </div>
               </div>
