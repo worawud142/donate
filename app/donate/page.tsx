@@ -73,11 +73,8 @@ export default function DonatePage() {
 
             <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center p-2 border border-slate-100">
-                  {/* Default Bank Icon, replace with actual bank logo if needed */}
-                  <svg className="w-8 h-8 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
+                <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center p-2 border border-slate-100 overflow-hidden">
+                  <img src="/images/BAAC_Logo.png" alt="BAAC Logo" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <div className="text-sm font-medium text-slate-500 mb-1">บัญชีธนาคาร (ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร)</div>
@@ -91,7 +88,7 @@ export default function DonatePage() {
               <div className="flex flex-col gap-2 w-full md:w-auto mt-2 md:mt-0">
                 <button
                   onClick={async () => {
-                    await navigator.clipboard.writeText("1234567890");
+                    await navigator.clipboard.writeText("020230032103");
                     const btn = document.getElementById("copy-btn-text");
                     if (btn) {
                       const original = btn.innerText;
@@ -224,9 +221,13 @@ export default function DonatePage() {
 
           {error && <div className="text-red-600 bg-red-50 border border-red-100 p-4 rounded-xl text-sm">{error}</div>}
           {ref && (
-            <div className="text-emerald-700 bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-sm">
-              ส่งข้อมูลสำเร็จ ✅ เลขอ้างอิง: <span className="font-semibold">{ref}</span>
-              <br /><span className="text-emerald-600 text-xs mt-1 block">{successMessage}</span>
+            <div className="text-emerald-700 bg-emerald-50 border border-emerald-100 p-6 rounded-xl text-center shadow-sm">
+              <div className="text-lg font-medium text-emerald-700 leading-relaxed">
+                ขอบคุณที่ร่วมเป็นส่วนหนึ่งในการสร้างอนาคตให้เด็กๆ!<br />
+                <span className="text-emerald-600 text-base mt-2 block">
+                  ทุกยอดบริจาคของคุณคือพลังสำคัญที่ช่วยเติมเต็มความฝันและโอกาสทางการศึกษาให้กับน้องๆ โรงเรียนบ้านขัวก่าย
+                </span>
+              </div>
             </div>
           )}
 
