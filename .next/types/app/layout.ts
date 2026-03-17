@@ -1,4 +1,4 @@
-// File: /Users/worawut/DoMe/app/layout.tsx
+// File: /Users/worawut/donate-1/app/layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

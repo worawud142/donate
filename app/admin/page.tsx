@@ -187,6 +187,16 @@ export default function AdminPage() {
     if (json.ok) setSlipUrl(json.url);
   }
 
+  async function handleLogout() {
+    if (!confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) return;
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      alert("เกิดข้อผิดพลาดในการออกจากระบบ: " + error.message);
+    } else {
+      router.push("/admin/login");
+    }
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-slate-50 font-sans p-6 md:p-10">
       {/* Decorative blurred blobs */}
@@ -207,7 +217,7 @@ export default function AdminPage() {
             <h1 className="text-3xl md:text-3xl font-bold text-slate-800 tracking-tight">ระบบแอดมิน (Admin Dashboard)</h1>
             <p className="text-slate-500 mt-2 text-sm">ตรวจสอบและอนุมัติรายการบริจาค</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center flex-wrap gap-3">
             <Link
               href="/admin/ecard"
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-sm text-sm font-semibold transition-colors"
@@ -218,6 +228,12 @@ export default function AdminPage() {
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
               {userEmail ? `${userEmail}` : "Not logged in"}
             </div>
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-2 bg-white hover:bg-rose-50 text-rose-600 px-4 py-2 rounded-full border border-rose-100 shadow-sm text-sm font-semibold transition-all duration-300"
+            >
+              <span>🚪</span> ออกจากระบบ
+            </button>
           </div>
         </div>
 
