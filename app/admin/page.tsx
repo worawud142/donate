@@ -39,29 +39,49 @@ export default function AdminPage() {
   const [slipUrl, setSlipUrl] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<Donation | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [approvalItem, setApprovalItem] = useState<Donation | null>(null);
+  const [reviewConfirmed, setReviewConfirmed] = useState(false);
   const router = useRouter();
+
+  async function getFreshToken() {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    const now = Math.floor(Date.now() / 1000);
+    const expiresAt = session?.expires_at ?? 0;
+
+    if (session?.access_token && expiresAt > now + 60) {
+      return session.access_token;
+    }
+
+    const { data, error } = await supabase.auth.refreshSession();
+    if (error) return session?.access_token ?? null;
+    return data.session?.access_token ?? session?.access_token ?? null;
+  }
 
   async function load() {
     setLoading(true);
     setAuthError(null);
     const { data: sessionData } = await supabase.auth.getSession();
     const sess = sessionData.session;
-    if (!sess) {
+    const freshToken = await getFreshToken();
+    if (!sess || !freshToken) {
       router.push("/admin/login");
       return;
     }
     setUserEmail(sess.user.email ?? null);
-    setToken(sess.access_token);
+    setToken(freshToken);
 
-    const { data: itemsData, error: itemsError } = await supabase
-      .from("donations")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (itemsError) {
-      setAuthError(`ดึงข้อมูลล้มเหลว: ${itemsError.message}`);
-    } else {
-      setItems(itemsData || []);
+    try {
+      const res = await fetch("/api/admin/list", {
+        headers: { Authorization: `Bearer ${freshToken}` },
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        throw new Error(json?.message || "ดึงข้อมูลล้มเหลว");
+      }
+      setItems(json.items || []);
+    } catch (error: any) {
+      setAuthError(`ดึงข้อมูลล้มเหลว: ${error?.message || "ไม่สามารถโหลดรายการได้"}`);
     }
     setLoading(false);
   }
@@ -90,18 +110,42 @@ export default function AdminPage() {
   }
 
   async function act(path: string, body: { id: string; publish?: boolean }) {
-    if (!token) return;
     setActionError(null);
     setPendingId(body.id);
     applyOptimistic(path, body);
 
     try {
+      const authToken = await getFreshToken();
+      if (!authToken) {
+        throw new Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
+      }
+      setToken(authToken);
+
       const res = await fetch(path, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
         body: JSON.stringify(body),
       });
       const json = await res.json();
+      if (!res.ok && json?.message === "Auth session missing!") {
+        const refreshed = await getFreshToken();
+        if (refreshed && refreshed !== authToken) {
+          setToken(refreshed);
+          const retry = await fetch(path, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${refreshed}` },
+            body: JSON.stringify(body),
+          });
+          const retryJson = await retry.json();
+          if (retry.ok && retryJson.ok) {
+            if (retryJson.item) {
+              setItems((prev) => prev.map((item) => (item.id === retryJson.item.id ? retryJson.item : item)));
+            }
+            return;
+          }
+          throw new Error(retryJson?.message || "อัปเดตสถานะไม่สำเร็จ");
+        }
+      }
       if (!res.ok || !json.ok) {
         throw new Error(json?.message || "อัปเดตสถานะไม่สำเร็จ");
       }
@@ -122,9 +166,15 @@ export default function AdminPage() {
     setPendingId(id);
     setActionError(null);
     try {
+      const authToken = await getFreshToken();
+      if (!authToken) {
+        throw new Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
+      }
+      setToken(authToken);
+
       const res = await fetch("/api/admin/delete", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
         body: JSON.stringify({ id }),
       });
       const json = await res.json();
@@ -146,15 +196,35 @@ export default function AdminPage() {
     return item.slip_path === "cash_donation_no_slip" ? "เงินสด" : "โอนเงิน";
   }
 
+  async function confirmApprove() {
+    if (!approvalItem) return;
+
+    if (!reviewConfirmed) {
+      setActionError("กรุณายืนยันว่าตรวจสอบยอดเงินในสลิปแล้ว");
+      return;
+    }
+
+    const item = approvalItem;
+    setApprovalItem(null);
+    setReviewConfirmed(false);
+    await act("/api/admin/approve", { id: item.id });
+  }
+
   async function saveEdit() {
-    if (!editingItem || !token) return;
+    if (!editingItem) return;
 
     setPendingId(editingItem.id);
     setActionError(null);
     try {
+      const authToken = await getFreshToken();
+      if (!authToken) {
+        throw new Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
+      }
+      setToken(authToken);
+
       const res = await fetch("/api/admin/update", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
         body: JSON.stringify(editingItem),
       });
       const json = await res.json();
@@ -170,17 +240,22 @@ export default function AdminPage() {
   }
 
   async function viewSlip(slip_path: string) {
-    if (!token) return;
-
     // Check if this is a cash donation (no actual slip)
     if (slip_path === "cash_donation_no_slip") {
       setSlipUrl("cash_donation");
       return;
     }
 
+    const authToken = await getFreshToken();
+    if (!authToken) {
+      setActionError("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
+      return;
+    }
+    setToken(authToken);
+
     const res = await fetch("/api/admin/signed-slip", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
       body: JSON.stringify({ slip_path }),
     });
     const json = await res.json();
@@ -217,10 +292,16 @@ export default function AdminPage() {
             <h1 className="text-3xl md:text-3xl font-bold text-slate-800 tracking-tight">ระบบแอดมิน (Admin Dashboard)</h1>
             <p className="text-slate-500 mt-2 text-sm">ตรวจสอบและอนุมัติรายการบริจาค</p>
           </div>
-          <div className="flex items-center flex-wrap gap-3">
+          <div className="flex flex-wrap items-center justify-start md:justify-end gap-3">
+            <Link
+              href="/admin/board"
+              className="inline-flex min-w-[160px] items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-full shadow-sm text-sm font-semibold transition-colors ring-1 ring-emerald-500/20"
+            >
+              <span className="text-lg">📺</span> Board
+            </Link>
             <Link
               href="/admin/ecard"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-sm text-sm font-semibold transition-colors"
+              className="inline-flex min-w-[160px] items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-sm text-sm font-semibold transition-colors"
             >
               <span className="text-lg">🖼️</span> สร้าง E-Card ขอบคุณ
             </Link>
@@ -301,7 +382,11 @@ export default function AdminPage() {
                             <button
                               className="px-3 py-1.5 text-xs font-semibold rounded-md bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 shadow-sm disabled:opacity-50 transition-colors"
                               disabled={pendingId === d.id}
-                              onClick={() => act("/api/admin/approve", { id: d.id })}
+                              onClick={() => {
+                                setActionError(null);
+                                setApprovalItem(d);
+                                setReviewConfirmed(false);
+                              }}
                             >
                               Approve
                             </button>
@@ -373,6 +458,71 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {/* Approve Confirmation Modal */}
+      {approvalItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold text-slate-800 mb-2">ตรวจสอบยอดก่อนอนุมัติ</h3>
+            <p className="text-sm text-slate-500 mb-4">
+              กรุณายืนยันยอดเงินจากสลิปให้ตรงกับรายการ ก่อนกดอนุมัติ
+            </p>
+
+            <div className="mb-4 p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-sm text-slate-600">
+              <div className="flex justify-between gap-4">
+                <span>ชื่อผู้บริจาค:</span>
+                <span className="font-semibold text-slate-800 text-right">{approvalItem.full_name}</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span>ยอดในรายการ:</span>
+                <span className="font-semibold text-slate-800">{Number(approvalItem.amount).toLocaleString()} บาท</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span>วันที่:</span>
+                <span className="font-semibold text-slate-800">{approvalItem.transfer_date}</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-4 text-sm text-emerald-800">
+                ยอดที่บันทึกไว้ในรายการ: <span className="font-semibold">{Number(approvalItem.amount).toLocaleString()} บาท</span>
+              </div>
+              <div>
+                <label className="flex items-start gap-3 text-sm text-slate-600 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={reviewConfirmed}
+                    onChange={(e) => setReviewConfirmed(e.target.checked)}
+                    className="mt-1 w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span>
+                    ตรวจสอบยอดเงินจากสลิปและข้อมูลรายการแล้ว และยอดตรงกันก่อนอนุมัติ
+                  </span>
+                </label>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={confirmApprove}
+                  disabled={pendingId === approvalItem.id || !reviewConfirmed}
+                  className="flex-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-60 disabled:cursor-not-allowed py-2 font-medium transition-colors"
+                >
+                  {pendingId === approvalItem.id ? "กำลังอนุมัติ..." : "ตรวจยอดแล้วและอนุมัติ"}
+                </button>
+                <button
+                  onClick={() => {
+                    setApprovalItem(null);
+                    setReviewConfirmed(false);
+                  }}
+                  className="flex-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 font-medium transition-colors"
+                >
+                  ยกเลิก
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Modal */}
       {showEditModal && editingItem && (

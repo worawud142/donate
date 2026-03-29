@@ -43,22 +43,32 @@ export default function AdminECardPage() {
             setAuthError(null);
 
             const { data: sessionData } = await supabase.auth.getSession();
-            if (!sessionData.session) {
+            const session = sessionData.session;
+            if (!session) {
                 router.push("/admin/login");
                 return;
             }
 
-            // Fetch only approved donations
-            const { data: itemsData, error: itemsError } = await supabase
-                .from("donations")
-                .select("id, full_name, alumni_batch, amount, transfer_date, status, team_name")
-                .eq("status", "approved")
-                .order("created_at", { ascending: false });
+            const { data, error } = await supabase.auth.getSession();
+            const accessToken = data.session?.access_token;
+            if (!accessToken) {
+                router.push("/admin/login");
+                return;
+            }
 
-            if (itemsError) {
-                setAuthError(`ดึงข้อมูลล้มเหลว: ${itemsError.message}`);
-            } else {
-                setItems(itemsData || []);
+            try {
+                const res = await fetch("/api/admin/list", {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                });
+                const json = await res.json();
+                if (!res.ok || !json.ok) {
+                    throw new Error(json?.message || "ดึงข้อมูลล้มเหลว");
+                }
+
+                const approvedItems = (json.items || []).filter((item: Donation) => item.status === "approved");
+                setItems(approvedItems);
+            } catch (itemsError: any) {
+                setAuthError(`ดึงข้อมูลล้มเหลว: ${itemsError?.message || "ไม่สามารถโหลดรายการได้"}`);
             }
             setLoading(false);
         }

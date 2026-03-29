@@ -90,12 +90,6 @@ export default async function HomePage() {
             >
               + ร่วมสมทบทุน
             </Link>
-            <Link
-              href="/board"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white/10 backdrop-blur-md text-white font-semibold shadow-[0_2px_15px_-4px_rgba(0,0,0,0.2)] border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-300"
-            >
-              ดูป้ายทำเนียบรุ่น
-            </Link>
           </div>
         </div>
       </div>

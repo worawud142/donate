@@ -3,33 +3,37 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function DonatePage() {
   const [loading, setLoading] = useState(false);
-  const [ref, setRef] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [successName, setSuccessName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [donationType, setDonationType] = useState<"transfer" | "cash">("transfer");
+  const router = useRouter();
   const fieldClass =
     "w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-200";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    setRef(null);
     setSuccessMessage(null);
+    setSuccessName(null);
     setLoading(true);
 
     const form = e.currentTarget;
     const fd = new FormData(form);
+    const fullName = String(fd.get("full_name") || "").trim();
 
     try {
       const res = await fetch("/api/donate", { method: "POST", body: fd });
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json.message || "ส่งข้อมูลไม่สำเร็จ");
-      setRef(json.ref);
-      setSuccessMessage(json.message || "ส่งข้อมูลสำเร็จ");
+      setSuccessName(fullName);
+      setSuccessMessage(json.message || "ระบบได้รับข้อมูลเรียบร้อยแล้ว");
       form.reset();
+      setDonationType("transfer");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -220,16 +224,6 @@ export default function DonatePage() {
           </div>
 
           {error && <div className="text-red-600 bg-red-50 border border-red-100 p-4 rounded-xl text-sm">{error}</div>}
-          {ref && (
-            <div className="text-emerald-700 bg-emerald-50 border border-emerald-100 p-6 rounded-xl text-center shadow-sm">
-              <div className="text-lg font-medium text-emerald-700 leading-relaxed">
-                ขอบคุณที่ร่วมเป็นส่วนหนึ่งในการสร้างอนาคตให้เด็กๆ!<br />
-                <span className="text-emerald-600 text-base mt-2 block">
-                  ทุกยอดบริจาคของคุณคือพลังสำคัญที่ช่วยเติมเต็มความฝันและโอกาสทางการศึกษาให้กับน้องๆ โรงเรียนบ้านขัวก่าย
-                </span>
-              </div>
-            </div>
-          )}
 
           <div className="pt-4">
             <button
@@ -245,6 +239,39 @@ export default function DonatePage() {
           </div>
         </form>
       </div>
+
+      {successMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+          <div className="w-full max-w-md rounded-3xl border border-emerald-100 bg-white p-7 shadow-[0_20px_60px_rgba(15,23,42,0.25)]">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-2xl font-bold">
+                ✓
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-800">ส่งข้อมูลสำเร็จ</h2>
+                <p className="text-sm text-slate-500">ขอบคุณที่ร่วมสมทบทุน</p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-emerald-50 border border-emerald-100 p-4 text-slate-700 leading-relaxed">
+              <p className="font-semibold text-slate-800">
+                {successName ? `ขอบคุณคุณ${successName}` : "ขอบคุณสำหรับการบริจาค"}
+              </p>
+              <p className="mt-1 text-sm text-slate-600">
+                {successMessage}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              className="mt-6 w-full rounded-full bg-slate-900 px-4 py-3 font-semibold text-white transition-colors hover:bg-slate-800"
+            >
+              ตกลง
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

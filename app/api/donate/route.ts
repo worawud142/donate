@@ -81,9 +81,9 @@ export async function POST(req: Request) {
       transfer_date,
       phone: phone || null,
       message: message || null,
-      verified: donation_method === "cash", // Auto-verify cash donations
+      verified: false,
       publish: true,
-      status: donation_method === "cash" ? "approved" : "pending",
+      status: "pending",
       // cash_note: donation_method === "cash" ? (cash_note || null) : null, // Commented out until column is added
     };
 
@@ -105,9 +105,7 @@ export async function POST(req: Request) {
       ok: true, 
       ref: ins.data.id, 
       status: ins.data.status,
-      message: donation_method === "cash" 
-        ? "บันทึกข้อมูลเงินสดสำเร็จ ✅ ยอดบริจาคจะแสดงบนหน้าเว็บทันที" 
-        : "ส่งข้อมูลสำเร็จ ✅ กรุณารอแอดมินตรวจสอบเพื่อยอดบริจาคจะไปแสดงบนหน้าเว็บครับ"
+      message: "ส่งข้อมูลสำเร็จ ✅ กรุณารอแอดมินตรวจสอบยอดก่อน ยอดบริจาคจะไปแสดงบนหน้าเว็บเมื่ออนุมัติแล้วครับ"
     });
   } catch (e: any) {
     return bad(e?.message || "เกิดข้อผิดพลาด", 500);

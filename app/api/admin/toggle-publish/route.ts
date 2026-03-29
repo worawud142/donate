@@ -20,6 +20,7 @@ export async function POST(req: Request) {
 
   revalidatePath("/");
   revalidatePath("/board");
+  revalidatePath("/admin/board");
   revalidatePath("/donors");
   revalidatePath("/admin/donors");
 

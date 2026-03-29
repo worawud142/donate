@@ -9,6 +9,10 @@ export async function POST(req: Request) {
   if (!guard.ok) return NextResponse.json({ ok: false, message: guard.message }, { status: guard.status });
 
   const { id } = await req.json();
+  if (!id) {
+    return NextResponse.json({ ok: false, message: "ไม่พบ ID รายการ" }, { status: 400 });
+  }
+
   const { data, error } = await guard.supabase
     .from("donations")
     .update({ verified: true, status: "approved", updated_at: new Date().toISOString() })
@@ -20,6 +24,7 @@ export async function POST(req: Request) {
 
   revalidatePath("/");
   revalidatePath("/board");
+  revalidatePath("/admin/board");
   revalidatePath("/donors");
   revalidatePath("/admin/donors");
 

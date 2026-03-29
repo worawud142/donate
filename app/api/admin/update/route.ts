@@ -60,6 +60,7 @@ export async function POST(req: Request) {
     // Revalidate paths to clear Next.js cache
     revalidatePath("/");
     revalidatePath("/board");
+    revalidatePath("/admin/board");
     revalidatePath("/donors");
     revalidatePath("/admin/donors");
 
