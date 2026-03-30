@@ -43,37 +43,46 @@ export default function AdminPage() {
   const [reviewConfirmed, setReviewConfirmed] = useState(false);
   const router = useRouter();
 
-  async function getFreshToken() {
+  async function resolveSession() {
     const { data: sessionData } = await supabase.auth.getSession();
     const session = sessionData.session;
+    if (!session) return null;
+
     const now = Math.floor(Date.now() / 1000);
     const expiresAt = session?.expires_at ?? 0;
 
     if (session?.access_token && expiresAt > now + 60) {
-      return session.access_token;
+      return { session, token: session.access_token };
     }
 
     const { data, error } = await supabase.auth.refreshSession();
-    if (error) return session?.access_token ?? null;
-    return data.session?.access_token ?? session?.access_token ?? null;
+    if (error) {
+      return session.access_token ? { session, token: session.access_token } : null;
+    }
+
+    const nextSession = data.session ?? session;
+    const nextToken = nextSession?.access_token ?? null;
+    if (!nextToken) return null;
+    return { session: nextSession, token: nextToken };
   }
 
   async function load() {
-    setLoading(true);
     setAuthError(null);
-    const { data: sessionData } = await supabase.auth.getSession();
-    const sess = sessionData.session;
-    const freshToken = await getFreshToken();
-    if (!sess || !freshToken) {
+    if (items.length === 0) {
+      setLoading(true);
+    }
+
+    const auth = await resolveSession();
+    if (!auth) {
       router.push("/admin/login");
       return;
     }
-    setUserEmail(sess.user.email ?? null);
-    setToken(freshToken);
+    setUserEmail(auth.session.user.email ?? null);
+    setToken(auth.token);
 
     try {
       const res = await fetch("/api/admin/list", {
-        headers: { Authorization: `Bearer ${freshToken}` },
+        headers: { Authorization: `Bearer ${auth.token}` },
       });
       const json = await res.json();
       if (!res.ok || !json.ok) {
@@ -115,25 +124,25 @@ export default function AdminPage() {
     applyOptimistic(path, body);
 
     try {
-      const authToken = await getFreshToken();
-      if (!authToken) {
+      const auth = await resolveSession();
+      if (!auth) {
         throw new Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
       }
-      setToken(authToken);
+      setToken(auth.token);
 
       const res = await fetch(path, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify(body),
       });
       const json = await res.json();
       if (!res.ok && json?.message === "Auth session missing!") {
-        const refreshed = await getFreshToken();
-        if (refreshed && refreshed !== authToken) {
-          setToken(refreshed);
+        const refreshed = await resolveSession();
+        if (refreshed && refreshed.token !== auth.token) {
+          setToken(refreshed.token);
           const retry = await fetch(path, {
             method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${refreshed}` },
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${refreshed.token}` },
             body: JSON.stringify(body),
           });
           const retryJson = await retry.json();
@@ -166,15 +175,15 @@ export default function AdminPage() {
     setPendingId(id);
     setActionError(null);
     try {
-      const authToken = await getFreshToken();
-      if (!authToken) {
+      const auth = await resolveSession();
+      if (!auth) {
         throw new Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
       }
-      setToken(authToken);
+      setToken(auth.token);
 
       const res = await fetch("/api/admin/delete", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify({ id }),
       });
       const json = await res.json();
@@ -216,15 +225,15 @@ export default function AdminPage() {
     setPendingId(editingItem.id);
     setActionError(null);
     try {
-      const authToken = await getFreshToken();
-      if (!authToken) {
+      const auth = await resolveSession();
+      if (!auth) {
         throw new Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
       }
-      setToken(authToken);
+      setToken(auth.token);
 
       const res = await fetch("/api/admin/update", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify(editingItem),
       });
       const json = await res.json();
@@ -246,16 +255,16 @@ export default function AdminPage() {
       return;
     }
 
-    const authToken = await getFreshToken();
-    if (!authToken) {
+    const auth = await resolveSession();
+    if (!auth) {
       setActionError("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
       return;
     }
-    setToken(authToken);
+    setToken(auth.token);
 
     const res = await fetch("/api/admin/signed-slip", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
       body: JSON.stringify({ slip_path }),
     });
     const json = await res.json();
@@ -319,8 +328,40 @@ export default function AdminPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center gap-3 py-10 px-5 text-slate-500">
-            <span className="w-5 h-5 rounded-full border-2 border-slate-300 border-t-slate-600 animate-spin" /> กำลังโหลดข้อมูล...
+          <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="lg:col-span-2 xl:col-span-3 rounded-3xl bg-white/80 backdrop-blur-xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+              <div className="overflow-x-auto animate-pulse">
+                <table className="w-full text-left whitespace-nowrap">
+                  <thead className="text-slate-500 bg-slate-50/50 text-sm tracking-wider uppercase">
+                    <tr>
+                      <th className="p-4 font-medium border-b border-slate-100">ชื่อ</th>
+                      <th className="p-4 font-medium border-b border-slate-100 text-center">รุ่น</th>
+                      <th className="p-4 font-medium border-b border-slate-100 text-right">ยอด</th>
+                      <th className="p-4 font-medium border-b border-slate-100 text-center">ช่องทาง</th>
+                      <th className="p-4 font-medium border-b border-slate-100 text-center">สถานะ</th>
+                      <th className="p-4 font-medium border-b border-slate-100 text-left">จัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100/80">
+                    {Array.from({ length: 6 }).map((_, idx) => (
+                      <tr key={idx}>
+                        <td className="p-4"><div className="h-4 w-40 rounded bg-slate-200" /></td>
+                        <td className="p-4 text-center"><div className="mx-auto h-4 w-10 rounded bg-slate-200" /></td>
+                        <td className="p-4 text-right"><div className="ml-auto h-4 w-24 rounded bg-slate-200" /></td>
+                        <td className="p-4 text-center"><div className="mx-auto h-4 w-20 rounded bg-slate-200" /></td>
+                        <td className="p-4 text-center"><div className="mx-auto h-5 w-24 rounded-full bg-slate-200" /></td>
+                        <td className="p-4"><div className="h-4 w-56 rounded bg-slate-200" /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="rounded-3xl bg-white/80 backdrop-blur-xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6">
+              <div className="h-5 w-32 rounded bg-slate-200 animate-pulse mb-4" />
+              <div className="h-64 rounded-xl border border-slate-200 bg-slate-100 animate-pulse" />
+            </div>
           </div>
         ) : authError ? (
           <div className="rounded-xl bg-red-50 border border-red-100 p-5 text-red-600">

@@ -43,13 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [pathname, router]);
 
   if (!ready) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-        <div className="rounded-2xl bg-white px-6 py-5 shadow-sm border border-slate-200 text-slate-600">
-          กำลังตรวจสอบสิทธิ์...
-        </div>
-      </div>
-    );
+    return <div className="min-h-screen bg-slate-50" />;
   }
 
   return children;
