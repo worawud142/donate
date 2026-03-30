@@ -4,11 +4,10 @@ import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
+import { getPublicSupabaseEnv } from "@/lib/supabase-config";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabaseEnv = getPublicSupabaseEnv();
+const supabase = supabaseEnv ? createClient(supabaseEnv.url, supabaseEnv.anonKey) : null;
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -21,6 +20,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     async function check() {
       if (pathname === "/admin/login") {
+        if (alive) setReady(true);
+        return;
+      }
+
+      if (!supabase) {
         if (alive) setReady(true);
         return;
       }

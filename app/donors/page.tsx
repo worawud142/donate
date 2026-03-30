@@ -1,16 +1,24 @@
 // app/donors/page.tsx
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
-
-function supabasePublic() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-}
+import { getPublicSupabaseEnv } from "@/lib/supabase-config";
 
 export default async function DonorsPage() {
-  const supabase = supabasePublic();
+  const supabaseEnv = getPublicSupabaseEnv();
+  if (!supabaseEnv) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+        <div className="max-w-lg rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-900 shadow-sm">
+          <h1 className="text-xl font-bold">ระบบยังเชื่อมต่อฐานข้อมูลไม่สำเร็จ</h1>
+          <p className="mt-2 text-sm leading-6 text-amber-800">
+            กรุณาตั้งค่า Supabase environment variables ให้ครบก่อนใช้งานหน้านี้
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const supabase = createClient(supabaseEnv.url, supabaseEnv.anonKey);
 
   const { data } = await supabase
     .from("donations")

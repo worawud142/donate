@@ -6,11 +6,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toPng } from 'html-to-image';
 import ECardTemplate, { ECardData } from "./ECardTemplate";
+import { getPublicSupabaseEnv } from "@/lib/supabase-config";
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabaseEnv = getPublicSupabaseEnv();
+const supabase = supabaseEnv ? createClient(supabaseEnv.url, supabaseEnv.anonKey) : null;
 
 type Donation = {
     id: string;
@@ -42,6 +41,12 @@ export default function AdminECardPage() {
             setLoading(true);
             setAuthError(null);
 
+            if (!supabase) {
+                setAuthError("ยังไม่มีค่าการเชื่อมต่อ Supabase สำหรับหน้า E-Card");
+                setLoading(false);
+                return;
+            }
+
             const { data: sessionData } = await supabase.auth.getSession();
             const session = sessionData.session;
             if (!session) {
@@ -49,8 +54,7 @@ export default function AdminECardPage() {
                 return;
             }
 
-            const { data, error } = await supabase.auth.getSession();
-            const accessToken = data.session?.access_token;
+            const accessToken = session.access_token;
             if (!accessToken) {
                 router.push("/admin/login");
                 return;

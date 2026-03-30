@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BoardDisplay from "@/app/board/BoardDisplay";
 import { supabaseService } from "@/lib/supabase-server";
+import { getServiceSupabaseEnv } from "@/lib/supabase-config";
 
 type BoardPageProps = {
   searchParams?: Promise<{
@@ -22,6 +23,20 @@ function pickMainBatch(batches: Map<number, number>): number | null {
 }
 
 export default async function AdminBoardPage({ searchParams }: BoardPageProps) {
+  const supabaseEnv = getServiceSupabaseEnv();
+  if (!supabaseEnv) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+        <div className="max-w-xl rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-900 shadow-sm">
+          <h1 className="text-xl font-bold">ระบบเชื่อมต่อฐานข้อมูลยังไม่พร้อม</h1>
+          <p className="mt-2 text-sm leading-6 text-amber-800">
+            กรุณาตั้งค่า Supabase service environment variables ให้ครบก่อนเข้า Board
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   const supabase = supabaseService();
 
   const [{ data: settings }, { data: donations }] = await Promise.all([

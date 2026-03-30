@@ -1,10 +1,14 @@
 // lib/supabase-server.ts
 import { createClient } from "@supabase/supabase-js";
+import { getServiceSupabaseEnv } from "./supabase-config";
 
 export function supabaseService() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  return createClient(url, serviceKey, {
+  const env = getServiceSupabaseEnv();
+  if (!env) {
+    throw new Error("Missing Supabase server environment variables.");
+  }
+
+  return createClient(env.url, env.serviceKey, {
     auth: { persistSession: false },
   });
 }

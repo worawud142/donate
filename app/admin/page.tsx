@@ -4,11 +4,10 @@ import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { getPublicSupabaseEnv } from "@/lib/supabase-config";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabaseEnv = getPublicSupabaseEnv();
+const supabase = supabaseEnv ? createClient(supabaseEnv.url, supabaseEnv.anonKey) : null;
 
 type Donation = {
   id: string;
@@ -44,6 +43,8 @@ export default function AdminPage() {
   const router = useRouter();
 
   async function resolveSession() {
+    if (!supabase) return null;
+
     const { data: sessionData } = await supabase.auth.getSession();
     const session = sessionData.session;
     if (!session) return null;
@@ -70,6 +71,12 @@ export default function AdminPage() {
     setAuthError(null);
     if (items.length === 0) {
       setLoading(true);
+    }
+
+    if (!supabase) {
+      setAuthError("ยังไม่มีค่าการเชื่อมต่อ Supabase สำหรับหน้าแอดมิน");
+      setLoading(false);
+      return;
     }
 
     const auth = await resolveSession();
@@ -129,6 +136,10 @@ export default function AdminPage() {
     applyOptimistic(path, body);
 
     try {
+      if (!supabase) {
+        throw new Error("ยังไม่มีค่าการเชื่อมต่อ Supabase สำหรับหน้าแอดมิน");
+      }
+
       const auth = await resolveSession();
       if (!auth) {
         throw new Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
@@ -180,6 +191,10 @@ export default function AdminPage() {
     setPendingId(id);
     setActionError(null);
     try {
+      if (!supabase) {
+        throw new Error("ยังไม่มีค่าการเชื่อมต่อ Supabase สำหรับหน้าแอดมิน");
+      }
+
       const auth = await resolveSession();
       if (!auth) {
         throw new Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
@@ -230,6 +245,10 @@ export default function AdminPage() {
     setPendingId(editingItem.id);
     setActionError(null);
     try {
+      if (!supabase) {
+        throw new Error("ยังไม่มีค่าการเชื่อมต่อ Supabase สำหรับหน้าแอดมิน");
+      }
+
       const auth = await resolveSession();
       if (!auth) {
         throw new Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
@@ -260,6 +279,11 @@ export default function AdminPage() {
       return;
     }
 
+    if (!supabase) {
+      setActionError("ยังไม่มีค่าการเชื่อมต่อ Supabase สำหรับหน้าแอดมิน");
+      return;
+    }
+
     const auth = await resolveSession();
     if (!auth) {
       setActionError("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
@@ -278,6 +302,10 @@ export default function AdminPage() {
 
   async function handleLogout() {
     if (!confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) return;
+    if (!supabase) {
+      router.push("/admin/login");
+      return;
+    }
     const { error } = await supabase.auth.signOut();
     if (error) {
       alert("เกิดข้อผิดพลาดในการออกจากระบบ: " + error.message);

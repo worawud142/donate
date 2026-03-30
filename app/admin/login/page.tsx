@@ -4,16 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-// Validate environment variables
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error("Missing Supabase environment variables. Please check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
-}
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getPublicSupabaseEnv } from "@/lib/supabase-config";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -21,11 +12,19 @@ export default function AdminLogin() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const supabaseEnv = getPublicSupabaseEnv();
+  const supabase = supabaseEnv ? createClient(supabaseEnv.url, supabaseEnv.anonKey) : null;
 
   async function login(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
     setLoading(true);
+
+    if (!supabase) {
+      setErr("ยังไม่มีค่า Supabase environment variables สำหรับหน้าเข้าสู่ระบบ");
+      setLoading(false);
+      return;
+    }
 
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -94,10 +93,16 @@ export default function AdminLogin() {
             สามารถใช้ระบบบันทึกรหัสผ่านของเบราว์เซอร์ได้
           </div>
 
+          {!supabaseEnv && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+              ยังไม่พบค่าการเชื่อมต่อ Supabase ในสภาพแวดล้อมนี้
+            </div>
+          )}
+
           {err && <div className="bg-red-50 border border-red-100 p-4 rounded-xl text-sm text-red-600 text-center">{err}</div>}
 
           <button
-            disabled={loading}
+            disabled={loading || !supabase}
             className="w-full rounded-full bg-slate-900 hover:bg-slate-800 text-white disabled:opacity-60 disabled:cursor-not-allowed py-3.5 font-semibold shadow-[0_8px_20px_-6px_rgba(0,0,0,0.3)] transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 mt-2"
           >
             {loading ? (
