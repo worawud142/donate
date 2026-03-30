@@ -100,6 +100,11 @@ export default function AdminPage() {
     // eslint-disable-next-line
   }, []);
 
+  useEffect(() => {
+    router.prefetch("/admin/board");
+    router.prefetch("/admin/ecard");
+  }, [router]);
+
   function applyOptimistic(path: string, body: { id: string; publish?: boolean }) {
     setItems((prev) =>
       prev.map((item) => {
