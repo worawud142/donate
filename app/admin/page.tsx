@@ -107,20 +107,6 @@ export default function AdminPage() {
     setLoading(false);
   }
 
-  const preloadSlipImage = useCallback(async (url: string) => {
-    await new Promise<void>((resolve) => {
-      const img = new Image();
-      img.decoding = "async";
-      img.loading = "eager";
-      img.onload = () => resolve();
-      img.onerror = () => resolve();
-      img.src = url;
-      if (typeof img.decode === "function") {
-        img.decode().then(() => resolve()).catch(() => resolve());
-      }
-    });
-  }, []);
-
   const getSignedSlipUrl = useCallback(async (slip_path: string) => {
     const cached = slipUrlCache.current.get(slip_path);
     if (cached && cached.expiresAt > Date.now()) {
@@ -356,20 +342,16 @@ export default function AdminPage() {
 
     try {
       const url = await getSignedSlipUrl(slip_path);
-      await preloadSlipImage(url);
       if (slipRequestSeq.current === requestId) {
         setSlipUrl(url);
       }
     } catch (error: any) {
       if (slipRequestSeq.current === requestId) {
         setActionError(error?.message || "ดึงสลิปไม่สำเร็จ");
-      }
-    } finally {
-      if (slipRequestSeq.current === requestId) {
         setSlipLoading(false);
       }
     }
-  }, [getSignedSlipUrl, preloadSlipImage, resolveSession]);
+  }, [getSignedSlipUrl]);
 
   async function handleLogout() {
     if (!confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) return;
@@ -520,6 +502,8 @@ export default function AdminPage() {
                             <button
                               className="px-3 py-1.5 text-xs font-semibold rounded-md bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 shadow-sm disabled:opacity-50 transition-colors"
                               disabled={pendingId === d.id}
+                              onMouseEnter={() => prefetchSlip(d.slip_path)}
+                              onFocus={() => prefetchSlip(d.slip_path)}
                               onClick={() => viewSlip(d.slip_path)}
                             >
                               ดูสลิป
@@ -576,7 +560,15 @@ export default function AdminPage() {
               <div className="font-bold text-lg mb-4 text-slate-800 flex items-center gap-2">
                 <span className="text-xl">📄</span> ดูสลิป (slip)
               </div>
-              {slipUrl ? (
+              {slipLoading ? (
+                <div className="h-64 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-500 text-sm p-6 text-center">
+                  <div>
+                    <div className="mx-auto mb-3 h-10 w-10 rounded-full border-4 border-slate-200 border-t-sky-500 animate-spin" />
+                    <div className="font-medium">กำลังโหลดสลิป...</div>
+                    <div className="mt-1 text-xs text-slate-400">ระบบกำลังเตรียมภาพขนาดย่อสำหรับแสดงผล</div>
+                  </div>
+                </div>
+              ) : slipUrl ? (
                 slipUrl === "cash_donation" ? (
                   <div className="h-64 rounded-xl border-2 border-dashed border-green-200 bg-green-50 flex items-center justify-center text-green-600 text-sm p-6 text-center">
                     <div>
@@ -588,7 +580,13 @@ export default function AdminPage() {
                 ) : (
                   // eslint-disable-next-line @next/next/no-img-element
                   <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50 relative group">
-                    <img alt="slip" src={slipUrl} className="w-full object-contain max-h-[500px]" />
+                    <img
+                      alt="slip"
+                      src={slipUrl}
+                      onLoad={() => setSlipLoading(false)}
+                      onError={() => setSlipLoading(false)}
+                      className="w-full object-contain max-h-[500px]"
+                    />
                     <a className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium backdrop-blur-sm" href={slipUrl} target="_blank">
                       เปิดขยายเต็มจอ ↗
                     </a>
