@@ -426,7 +426,7 @@ export default function AdminPage() {
                       <th className="p-4 font-medium border-b border-slate-100 text-right">ยอด</th>
                       <th className="p-4 font-medium border-b border-slate-100 text-center">ช่องทาง</th>
                       <th className="p-4 font-medium border-b border-slate-100 text-center">สถานะ</th>
-                      <th className="p-4 font-medium border-b border-slate-100 text-left w-[34rem] min-w-[34rem] whitespace-nowrap">จัดการ</th>
+                      <th className="p-4 font-medium border-b border-slate-100 text-left w-[44rem] min-w-[44rem] whitespace-nowrap">จัดการ</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100/80">
@@ -498,8 +498,8 @@ export default function AdminPage() {
                             <span className="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-700">รอตรวจสอบ</span>
                           )}
                         </td>
-                        <td className="p-4 w-[34rem] min-w-[34rem]">
-                          <div className="flex flex-nowrap items-center gap-1.5 whitespace-nowrap overflow-x-auto">
+                        <td className="p-4 w-[44rem] min-w-[44rem] align-top overflow-x-auto">
+                          <div className="inline-flex min-w-max flex-nowrap items-center gap-1.5 whitespace-nowrap">
                             <button
                               className="shrink-0 px-2.5 py-1 text-[11px] font-semibold rounded-md bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 shadow-sm disabled:opacity-50 transition-colors"
                               disabled={pendingId === d.id}
