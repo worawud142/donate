@@ -344,6 +344,7 @@ export default function AdminPage() {
       const url = await getSignedSlipUrl(slip_path);
       if (slipRequestSeq.current === requestId) {
         setSlipUrl(url);
+        setSlipLoading(false);
       }
     } catch (error: any) {
       if (slipRequestSeq.current === requestId) {
@@ -583,8 +584,6 @@ export default function AdminPage() {
                     <img
                       alt="slip"
                       src={slipUrl}
-                      onLoad={() => setSlipLoading(false)}
-                      onError={() => setSlipLoading(false)}
                       className="w-full object-contain max-h-[500px]"
                     />
                     <a className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium backdrop-blur-sm" href={slipUrl} target="_blank">
