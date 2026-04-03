@@ -136,10 +136,10 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
                         ติดต่อประสานงาน
                     </div>
                     <div className="grid grid-cols-[auto_1fr] gap-x-8 gap-y-3 text-xl font-medium text-slate-200">
-                        <div className="text-right text-slate-400">ผอ. อภัย ปังจุทา</div>
+                        <div className="text-right text-slate-400">ผอ.อภัย ปังอุทา</div>
                         <div className="tracking-wider">090-920-2229</div>
 
-                        <div className="text-right text-slate-400">ครูปิลานี อุปพงษ์</div>
+                        <div className="text-right text-slate-400">ครูอุราพร ธุระแพง</div>
                         <div className="tracking-wider">081-053-3296</div>
 
                         <div className="text-right text-slate-400">ครูจุราพร ธุระแพง</div>
