@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { forwardRef } from "react";
 import CountUp from "@/components/CountUp";
 
@@ -15,9 +14,11 @@ type Props = {
     data: ECardData | null;
     domeSrc: string;
     logoSrc: string;
+    showName?: boolean;
+    showBatch?: boolean;
 };
 
-const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSrc }, ref) => {
+const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSrc, showName = true, showBatch = true }, ref) => {
     if (!data) return null;
 
     return (
@@ -33,12 +34,12 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
         >
             {/* --- Background Image Section --- */}
             <div className="absolute top-0 left-0 w-full h-[60%]">
-                <Image
+                <img
                     src={domeSrc}
                     alt="โดมโรงเรียน"
-                    fill
-                    className="object-cover"
-                    priority
+                    className="absolute inset-0 h-full w-full object-cover"
+                    loading="eager"
+                    decoding="async"
                 />
                 {/* Gradient fade to white/slate-50 at the bottom of the image */}
                 <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/40 to-slate-50" />
@@ -47,7 +48,7 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
             {/* --- Top Header / Purpose --- */}
             <div className="relative z-10 w-full pt-16 px-12 text-center text-white drop-shadow-md">
                 <h2 className="text-4xl font-semibold tracking-wide mb-2 opacity-95">
-                    "ตุ้มโฮมศิษย์เก่า ครั้งที่ 3"
+                    "ตุ้มโฮมศิษย์เก่า ปีที่ 3"
                 </h2>
                 <h1 className="text-4xl font-bold tracking-tight mb-2 text-yellow-300 drop-shadow-lg">
                     เพื่อสมทบทุนสร้างโดมอเนกประสงค์
@@ -60,11 +61,12 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
             {/* --- Logo Space --- */}
             <div className="relative z-10 mt-8 mb-4">
                 <div className="relative w-[220px] h-[220px] rounded-full border-[8px] border-white shadow-xl bg-white overflow-hidden flex items-center justify-center">
-                    <Image
+                    <img
                         src={logoSrc}
                         alt="โลโก้โรงเรียน"
-                        fill
-                        className="object-cover"
+                        className="absolute inset-0 h-full w-full object-cover"
+                        loading="eager"
+                        decoding="async"
                     />
                 </div>
             </div>
@@ -73,10 +75,17 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
             <div className="relative z-10 w-[90%] bg-white/95 backdrop-blur-sm rounded-[3rem] shadow-2xl border-4 border-yellow-400/30 p-8 text-center mb-4 flex flex-col items-center">
                 <h3 className="text-3xl font-bold text-slate-800 mb-4">ขอขอบพระคุณ</h3>
 
-                <div className="text-6xl font-black text-blue-900 mb-2 tracking-tight drop-shadow-sm min-h-[80px]">
-                    {data.fullName}
-                    {data.batch && <span className="text-4xl text-blue-800/80 ml-4 font-bold">(รุ่น {data.batch})</span>}
-                </div>
+                {showName && (
+                    <div className="text-6xl font-black text-blue-900 mb-2 tracking-tight drop-shadow-sm min-h-[80px]">
+                        {data.fullName}
+                    </div>
+                )}
+
+                {showBatch && data.batch && (
+                    <div className={`${showName ? "text-4xl" : "text-5xl"} font-bold text-blue-800/80 mb-2 tracking-tight drop-shadow-sm`}>
+                        ศิษย์เก่า รุ่น {data.batch}
+                    </div>
+                )}
 
                 {data.teamName && (
                     <div className="text-2xl font-bold text-slate-600 mb-4 border-b-2 border-slate-100 pb-2 inline-block px-8">

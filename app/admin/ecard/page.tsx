@@ -21,19 +21,49 @@ type Donation = {
     team_name?: string;
 };
 
+type ExportAssets = {
+    domeSrc: string;
+    logoSrc: string;
+};
+
+async function blobToDataUrl(blob: Blob) {
+    const arrayBuffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = "";
+    const chunkSize = 0x8000;
+
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+    }
+
+    return `data:${blob.type || "application/octet-stream"};base64,${btoa(binary)}`;
+}
+
+async function loadImageAsDataUrl(src: string) {
+    const res = await fetch(src, { cache: "force-cache" });
+    if (!res.ok) {
+        throw new Error(`โหลดรูปภาพไม่สำเร็จ: ${src}`);
+    }
+
+    return blobToDataUrl(await res.blob());
+}
+
 export default function AdminECardPage() {
     const [items, setItems] = useState<Donation[]>([]);
     const [loading, setLoading] = useState(true);
     const [authError, setAuthError] = useState<string | null>(null);
     const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
+    const [exportAssets, setExportAssets] = useState<ExportAssets | null>(null);
+    const [assetError, setAssetError] = useState<string | null>(null);
 
     // Status flags for the image generation
     const [isGenerating, setIsGenerating] = useState(false);
 
     // Toggle for showing batch
     const [showBatch, setShowBatch] = useState(true);
+    const [showName, setShowName] = useState(true);
 
-    const ecardRef = useRef<HTMLDivElement>(null);
+    const exportEcardRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -79,19 +109,56 @@ export default function AdminECardPage() {
         load();
     }, [router]);
 
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadAssets() {
+            try {
+                const [domeSrc, logoSrc] = await Promise.all([
+                    loadImageAsDataUrl("/dome.JPG"),
+                    loadImageAsDataUrl("/school-logo.jpg"),
+                ]);
+
+                if (!cancelled) {
+                    setExportAssets({ domeSrc, logoSrc });
+                    setAssetError(null);
+                }
+            } catch (error) {
+                console.error("Failed to load export assets", error);
+                if (!cancelled) {
+                    setExportAssets({
+                        domeSrc: "/dome-placeholder.svg",
+                        logoSrc: "/school-logo-placeholder.svg",
+                    });
+                    setAssetError("ไม่สามารถโหลดรูปต้นฉบับได้ ระบบจะใช้ภาพสำรองแทน");
+                }
+            }
+        }
+
+        loadAssets();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
     const handleDownload = useCallback(async () => {
-        if (ecardRef.current === null || !selectedDonation) {
+        if (exportEcardRef.current === null || !selectedDonation || !exportAssets) {
             return;
         }
 
         try {
             setIsGenerating(true);
 
-            // Need a slight delay for fonts/images to fully render before screenshot if just opened
-            await new Promise(resolve => setTimeout(resolve, 300));
+            if (document.fonts?.ready) {
+                await document.fonts.ready;
+            }
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 
-            const dataUrl = await toPng(ecardRef.current, {
-                quality: 1.0, width: 1080, height: 1350
+            const dataUrl = await toPng(exportEcardRef.current, {
+                quality: 1.0,
+                width: 1080,
+                height: 1350,
             });
 
             const link = document.createElement('a');
@@ -104,7 +171,7 @@ export default function AdminECardPage() {
         } finally {
             setIsGenerating(false);
         }
-    }, [selectedDonation]);
+    }, [selectedDonation, exportAssets]);
 
     const ecardData: ECardData | null = selectedDonation ? {
         fullName: selectedDonation.full_name,
@@ -135,6 +202,12 @@ export default function AdminECardPage() {
                         <p className="text-slate-500 mt-2 text-sm">สร้างรูปภาพโปสเตอร์ E-Card ทางการส่งให้ผู้บริจาค (เฉพาะรายการที่อนุมัติแล้ว)</p>
                     </div>
                 </div>
+
+                {assetError && (
+                    <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                        {assetError}
+                    </div>
+                )}
 
                 {loading ? (
                     <div className="flex items-center gap-3 py-10 px-5 text-slate-500">
@@ -205,25 +278,38 @@ export default function AdminECardPage() {
                                         <span className="text-xl">🖼️</span> ดูตัวอย่างและดาวน์โหลด E-Card
                                     </h2>
                                     {selectedDonation && (
-                                        <label className="flex items-center gap-2 mt-3 text-sm font-medium text-slate-600 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={showBatch}
-                                                onChange={(e) => setShowBatch(e.target.checked)}
-                                                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                            />
-                                            แสดงรุ่นศิษย์เก่าบนป้าย
-                                        </label>
+                                        <div className="mt-3 space-y-2 text-sm font-medium text-slate-600">
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={showName}
+                                                    onChange={(e) => setShowName(e.target.checked)}
+                                                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                แสดงชื่อผู้บริจาคบนป้าย
+                                            </label>
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={showBatch}
+                                                    onChange={(e) => setShowBatch(e.target.checked)}
+                                                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                แสดงรุ่นศิษย์เก่าบนป้าย
+                                            </label>
+                                        </div>
                                     )}
                                 </div>
                                 {selectedDonation && (
                                     <button
                                         onClick={handleDownload}
-                                        disabled={isGenerating}
+                                        disabled={isGenerating || !exportAssets}
                                         className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl font-semibold shadow-md shadow-emerald-500/20 transition-all flex items-center gap-2 disabled:opacity-50"
                                     >
                                         {isGenerating ? (
                                             <><span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span> กำลังสร้างภาพ...</>
+                                        ) : !exportAssets ? (
+                                            <>⏳ กำลังเตรียมรูปภาพ...</>
                                         ) : (
                                             <>📥 ดาวน์โหลดภาพ (.png)</>
                                         )}
@@ -243,13 +329,14 @@ export default function AdminECardPage() {
                          We render the full 1080x1350 template inside a container that scales it down 
                          using CSS transform so it acts like a thumbnail preview.
                       */}
-                                        <div className="relative" style={{ width: '400px', height: '500px' }}>
-                                            <div style={{ transform: 'scale(0.3703)', transformOrigin: 'top left' }}>
+                                        <div className="relative" style={{ width: '360px', height: '450px' }}>
+                                            <div style={{ transform: 'scale(0.3333)', transformOrigin: 'top left' }}>
                                                 <ECardTemplate
-                                                    ref={ecardRef}
                                                     data={ecardData}
-                                                    domeSrc="/dome.JPG"
-                                                    logoSrc="/school-logo.jpg"
+                                                    domeSrc={exportAssets?.domeSrc ?? "/dome-placeholder.svg"}
+                                                    logoSrc={exportAssets?.logoSrc ?? "/school-logo-placeholder.svg"}
+                                                    showName={showName}
+                                                    showBatch={showBatch}
                                                 />
                                             </div>
                                         </div>
@@ -258,6 +345,19 @@ export default function AdminECardPage() {
                             </div>
                         </div>
 
+                    </div>
+                )}
+
+                {ecardData && (
+                    <div className="fixed left-[-10000px] top-0 pointer-events-none">
+                        <ECardTemplate
+                            ref={exportEcardRef}
+                            data={ecardData}
+                            domeSrc={exportAssets?.domeSrc ?? "/dome-placeholder.svg"}
+                            logoSrc={exportAssets?.logoSrc ?? "/school-logo-placeholder.svg"}
+                            showName={showName}
+                            showBatch={showBatch}
+                        />
                     </div>
                 )}
             </div>
