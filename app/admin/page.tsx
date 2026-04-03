@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getPublicSupabaseEnv } from "@/lib/supabase-config";
@@ -36,11 +36,16 @@ export default function AdminPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [slipUrl, setSlipUrl] = useState<string | null>(null);
+  const [slipLoading, setSlipLoading] = useState(false);
   const [editingItem, setEditingItem] = useState<Donation | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [approvalItem, setApprovalItem] = useState<Donation | null>(null);
   const [reviewConfirmed, setReviewConfirmed] = useState(false);
   const router = useRouter();
+  const slipUrlCache = useRef<Map<string, { url: string; expiresAt: number }>>(new Map());
+  const slipRequestCache = useRef<Map<string, Promise<string>>>(new Map());
+  const slipRequestSeq = useRef(0);
+  const SLIP_CACHE_TTL_MS = 4 * 60 * 1000;
 
   async function resolveSession() {
     if (!supabase) return null;
@@ -101,6 +106,71 @@ export default function AdminPage() {
     }
     setLoading(false);
   }
+
+  const preloadSlipImage = useCallback(async (url: string) => {
+    await new Promise<void>((resolve) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.loading = "eager";
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
+      img.src = url;
+      if (typeof img.decode === "function") {
+        img.decode().then(() => resolve()).catch(() => resolve());
+      }
+    });
+  }, []);
+
+  const getSignedSlipUrl = useCallback(async (slip_path: string) => {
+    const cached = slipUrlCache.current.get(slip_path);
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.url;
+    }
+
+    const pending = slipRequestCache.current.get(slip_path);
+    if (pending) {
+      return pending;
+    }
+
+    const promise = (async () => {
+      if (!supabase) {
+        throw new Error("ยังไม่มีค่าการเชื่อมต่อ Supabase สำหรับหน้าแอดมิน");
+      }
+
+      const auth = await resolveSession();
+      if (!auth) {
+        throw new Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
+      }
+      setToken(auth.token);
+
+      const res = await fetch("/api/admin/signed-slip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
+        body: JSON.stringify({ slip_path }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok || !json.url) {
+        throw new Error(json?.message || "ดึงสลิปไม่สำเร็จ");
+      }
+
+      slipUrlCache.current.set(slip_path, {
+        url: json.url,
+        expiresAt: Date.now() + SLIP_CACHE_TTL_MS,
+      });
+
+      return json.url as string;
+    })().finally(() => {
+      slipRequestCache.current.delete(slip_path);
+    });
+
+    slipRequestCache.current.set(slip_path, promise);
+    return promise;
+  }, [resolveSession, setToken]);
+
+  const prefetchSlip = useCallback((slip_path: string) => {
+    if (slip_path === "cash_donation_no_slip") return;
+    void getSignedSlipUrl(slip_path).catch(() => undefined);
+  }, [getSignedSlipUrl]);
 
   useEffect(() => {
     load();
@@ -272,33 +342,34 @@ export default function AdminPage() {
     }
   }
 
-  async function viewSlip(slip_path: string) {
+  const viewSlip = useCallback(async (slip_path: string) => {
     // Check if this is a cash donation (no actual slip)
     if (slip_path === "cash_donation_no_slip") {
+      setSlipLoading(false);
       setSlipUrl("cash_donation");
       return;
     }
 
-    if (!supabase) {
-      setActionError("ยังไม่มีค่าการเชื่อมต่อ Supabase สำหรับหน้าแอดมิน");
-      return;
-    }
+    const requestId = ++slipRequestSeq.current;
+    setSlipLoading(true);
+    setSlipUrl(null);
 
-    const auth = await resolveSession();
-    if (!auth) {
-      setActionError("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
-      return;
+    try {
+      const url = await getSignedSlipUrl(slip_path);
+      await preloadSlipImage(url);
+      if (slipRequestSeq.current === requestId) {
+        setSlipUrl(url);
+      }
+    } catch (error: any) {
+      if (slipRequestSeq.current === requestId) {
+        setActionError(error?.message || "ดึงสลิปไม่สำเร็จ");
+      }
+    } finally {
+      if (slipRequestSeq.current === requestId) {
+        setSlipLoading(false);
+      }
     }
-    setToken(auth.token);
-
-    const res = await fetch("/api/admin/signed-slip", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
-      body: JSON.stringify({ slip_path }),
-    });
-    const json = await res.json();
-    if (json.ok) setSlipUrl(json.url);
-  }
+  }, [getSignedSlipUrl, preloadSlipImage, resolveSession]);
 
   async function handleLogout() {
     if (!confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) return;
