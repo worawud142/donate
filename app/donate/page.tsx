@@ -5,6 +5,105 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+const SLIP_MAX_DIMENSION = 1600;
+const SLIP_MIN_SIZE_TO_COMPRESS = 350 * 1024;
+const SLIP_COMPRESS_QUALITY = 0.82;
+
+async function loadImageFromFile(file: File) {
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    const image = new Image();
+    image.decoding = "async";
+    image.src = objectUrl;
+
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error("โหลดรูปสลิปไม่สำเร็จ"));
+    });
+
+    if (typeof image.decode === "function") {
+      try {
+        await image.decode();
+      } catch {
+        // Some browsers decode lazily; the onload result is still usable for canvas draw.
+      }
+    }
+
+    return image;
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+async function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number) {
+  return await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), type, quality);
+  });
+}
+
+async function compressSlipImage(file: File) {
+  if (!file.type.startsWith("image/")) {
+    return file;
+  }
+
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "slip";
+  const shouldCompress =
+    file.size > SLIP_MIN_SIZE_TO_COMPRESS ||
+    file.type === "image/png" ||
+    file.type === "image/webp";
+
+  if (!shouldCompress) {
+    return file;
+  }
+
+  try {
+    const image = await loadImageFromFile(file);
+    const width = image.naturalWidth || image.width;
+    const height = image.naturalHeight || image.height;
+
+    if (!width || !height) {
+      return file;
+    }
+
+    const scale = Math.min(1, SLIP_MAX_DIMENSION / Math.max(width, height));
+    const targetWidth = Math.max(1, Math.round(width * scale));
+    const targetHeight = Math.max(1, Math.round(height * scale));
+
+    if (scale === 1 && file.size <= SLIP_MIN_SIZE_TO_COMPRESS) {
+      return file;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      return file;
+    }
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, targetWidth, targetHeight);
+    ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+    const webpBlob = await canvasToBlob(canvas, "image/webp", SLIP_COMPRESS_QUALITY);
+    const outputBlob = webpBlob || (await canvasToBlob(canvas, "image/jpeg", SLIP_COMPRESS_QUALITY));
+    if (!outputBlob) {
+      return file;
+    }
+
+    const outputExt = outputBlob.type === "image/webp" ? "webp" : "jpg";
+    return new File([outputBlob], `${baseName}-compressed.${outputExt}`, {
+      type: outputBlob.type,
+      lastModified: Date.now(),
+    });
+  } catch (error) {
+    console.warn("Could not compress slip image, uploading original file instead.", error);
+    return file;
+  }
+}
+
 export default function DonatePage() {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -27,6 +126,12 @@ export default function DonatePage() {
     const fullName = String(fd.get("full_name") || "").trim();
 
     try {
+      const slipFile = fd.get("slip");
+      if (donationType === "transfer" && slipFile instanceof File && slipFile.size > 0) {
+        const compressedSlip = await compressSlipImage(slipFile);
+        fd.set("slip", compressedSlip, compressedSlip.name);
+      }
+
       const res = await fetch("/api/donate", { method: "POST", body: fd });
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json.message || "ส่งข้อมูลไม่สำเร็จ");
@@ -201,7 +306,7 @@ export default function DonatePage() {
             </div>
             {donationType === "transfer" ? (
               <div>
-                <label className="block mb-2 text-sm font-medium text-slate-600">แนบสลิป (JPG/PNG ≤ 5MB) *</label>
+                <label className="block mb-2 text-sm font-medium text-slate-600">แนบสลิป (ระบบย่อรูปให้อัตโนมัติ) *</label>
                 <input
                   name="slip"
                   required
