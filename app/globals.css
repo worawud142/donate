@@ -1,5 +1,45 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Sukhumvit Set";
+  src: url("/fonts/SukhumvitSet.ttc") format("truetype");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Sukhumvit Set";
+  src: url("/fonts/SukhumvitSet.ttc") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Sukhumvit Set";
+  src: url("/fonts/SukhumvitSet.ttc") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Sukhumvit Set";
+  src: url("/fonts/SukhumvitSet.ttc") format("truetype");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Sukhumvit Set";
+  src: url("/fonts/SukhumvitSet.ttc") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
 @theme {
   --font-sans: "Sukhumvit Set", "Sukhumvit", "Prompt", "Noto Sans Thai", ui-sans-serif, system-ui, sans-serif;
 }
