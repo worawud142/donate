@@ -498,10 +498,10 @@ export default function AdminPage() {
                             <span className="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-700">รอตรวจสอบ</span>
                           )}
                         </td>
-                        <td className="p-4 align-top">
-                          <div className="inline-flex min-w-max flex-nowrap items-center gap-1 whitespace-nowrap">
+                        <td className="py-4 pl-4 pr-2 align-top">
+                          <div className="inline-flex min-w-max flex-nowrap items-center gap-0.5 whitespace-nowrap">
                             <button
-                              className="shrink-0 px-2.5 py-1 text-[11px] font-semibold rounded-md bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 shadow-sm disabled:opacity-50 transition-colors"
+                              className="shrink-0 px-[9px] py-1 text-[11px] font-semibold rounded-md bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 shadow-sm disabled:opacity-50 transition-colors"
                               disabled={pendingId === d.id}
                               onMouseEnter={() => prefetchSlip(d.slip_path)}
                               onFocus={() => prefetchSlip(d.slip_path)}
@@ -510,7 +510,7 @@ export default function AdminPage() {
                               ดูสลิป
                             </button>
                             <button
-                              className="shrink-0 px-2.5 py-1 text-[11px] font-semibold rounded-md bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 shadow-sm disabled:opacity-50 transition-colors"
+                              className="shrink-0 px-[9px] py-1 text-[11px] font-semibold rounded-md bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 shadow-sm disabled:opacity-50 transition-colors"
                               disabled={pendingId === d.id}
                               onClick={() => {
                                 setActionError(null);
@@ -521,14 +521,14 @@ export default function AdminPage() {
                               Approve
                             </button>
                             <button
-                              className="shrink-0 px-2.5 py-1 text-[11px] font-semibold rounded-md bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 shadow-sm disabled:opacity-50 transition-colors"
+                              className="shrink-0 px-[9px] py-1 text-[11px] font-semibold rounded-md bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 shadow-sm disabled:opacity-50 transition-colors"
                               disabled={pendingId === d.id}
                               onClick={() => act("/api/admin/reject", { id: d.id })}
                             >
                               Reject
                             </button>
                             <button
-                              className={`shrink-0 px-2.5 py-1 text-[11px] font-semibold rounded-md shadow-sm disabled:opacity-50 transition-colors ${d.publish ? 'bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100' : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'}`}
+                              className={`shrink-0 px-[9px] py-1 text-[11px] font-semibold rounded-md shadow-sm disabled:opacity-50 transition-colors ${d.publish ? 'bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100' : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'}`}
                               disabled={pendingId === d.id}
                               onClick={() => act("/api/admin/toggle-publish", { id: d.id, publish: !d.publish })}
                               title={d.publish ? "เผยแพร่" : "ไม่เผยแพร่"}
@@ -536,14 +536,14 @@ export default function AdminPage() {
                               Publish: {d.publish ? 'ON' : 'OFF'}
                             </button>
                             <button
-                              className="shrink-0 px-2.5 py-1 text-[11px] font-semibold rounded-md bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200 shadow-sm disabled:opacity-50 transition-colors"
+                              className="shrink-0 px-[9px] py-1 text-[11px] font-semibold rounded-md bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200 shadow-sm disabled:opacity-50 transition-colors"
                               disabled={pendingId === d.id}
                               onClick={() => startEdit(d)}
                             >
                               แก้ไข
                             </button>
                             <button
-                              className="shrink-0 px-2.5 py-1 text-[11px] font-semibold rounded-md bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 shadow-sm disabled:opacity-50 transition-colors"
+                              className="shrink-0 px-[9px] py-1 text-[11px] font-semibold rounded-md bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 shadow-sm disabled:opacity-50 transition-colors"
                               disabled={pendingId === d.id}
                               onClick={() => deleteDonation(d.id)}
                             >
