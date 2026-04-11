@@ -6,6 +6,7 @@ const prompt = Prompt({
   weight: ["300", "400", "500", "600", "700"],
   subsets: ["thai", "latin"],
   display: "swap",
+  variable: "--font-prompt",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body className={`${prompt.className} antialiased bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900`}>{children}</body>
+      <body className={`${prompt.className} ${prompt.variable} antialiased bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900`}>{children}</body>
     </html>
   );
 }
