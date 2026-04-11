@@ -7,7 +7,6 @@ import Link from "next/link";
 import { toPng } from 'html-to-image';
 import ECardTemplate, { ECardData } from "./ECardTemplate";
 import { getPublicSupabaseEnv } from "@/lib/supabase-config";
-import { SANS_FONT_STACK } from "@/lib/fonts";
 
 const supabaseEnv = getPublicSupabaseEnv();
 const supabase = supabaseEnv ? createClient(supabaseEnv.url, supabaseEnv.anonKey) : null;
@@ -151,14 +150,9 @@ export default function AdminECardPage() {
         try {
             setIsGenerating(true);
 
-            const fontReadyPromises: Promise<unknown>[] = [];
             if (document.fonts?.ready) {
-                fontReadyPromises.push(document.fonts.ready);
+                await document.fonts.ready;
             }
-            if (document.fonts?.load) {
-                fontReadyPromises.push(document.fonts.load(`16px ${SANS_FONT_STACK}`));
-            }
-            await Promise.allSettled(fontReadyPromises);
             await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 
             const dataUrl = await toPng(exportEcardRef.current, {

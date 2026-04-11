@@ -2,7 +2,6 @@
 
 import { forwardRef } from "react";
 import CountUp from "@/components/CountUp";
-import { SANS_FONT_STACK } from "@/lib/fonts";
 
 export type ECardData = {
     fullName: string;
@@ -30,8 +29,7 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
             style={{
                 // Using transform scale allows us to render it big (for high-res) 
                 // but preview it small in the admin UI if needed.
-                transformOrigin: "top left",
-                fontFamily: SANS_FONT_STACK,
+                transformOrigin: "top left"
             }}
         >
             {/* --- Background Image Section --- */}

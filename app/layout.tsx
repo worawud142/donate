@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
+import { Prompt } from "next/font/google";
 import "./globals.css";
-import { SANS_FONT_STACK } from "@/lib/fonts";
+
+const prompt = Prompt({
+  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["thai", "latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "โดมอเนกประสงค์ โรงเรียนบ้านขัวก่าย",
@@ -14,12 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body
-        className="bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900"
-        style={{ fontFamily: SANS_FONT_STACK, fontWeight: 700 }}
-      >
-        {children}
-      </body>
+      <body className={`${prompt.className} antialiased bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900`}>{children}</body>
     </html>
   );
 }
