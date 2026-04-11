@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Prompt", "Noto Sans Thai", ui-sans-serif, system-ui, sans-serif;
+}
+
 html,
 body {
   margin: 0;
