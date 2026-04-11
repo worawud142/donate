@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="th">
       <body
         className="bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900"
-        style={{ fontFamily: SANS_FONT_STACK, fontWeight: 500 }}
+        style={{ fontFamily: SANS_FONT_STACK, fontWeight: 700 }}
       >
         {children}
       </body>
