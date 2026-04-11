@@ -142,7 +142,7 @@ const ECardTemplate = forwardRef<HTMLDivElement, Props>(({ data, domeSrc, logoSr
                         <div className="text-right text-slate-400">ครูอุราพร ธุระแพง</div>
                         <div className="tracking-wider">081-053-3296</div>
 
-                        <div className="text-right text-slate-400">นางปิลานี อุปพงษ์</div>
+                        <div className="text-right text-slate-400">ครูปิลานี อุปพงษ์</div>
                         <div className="tracking-wider">092-793-6519</div>
                     </div>
                 </div>
