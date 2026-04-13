@@ -1,28 +1,31 @@
 // app/page.tsx
-import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import Image from "next/image";
+import { unstable_noStore as noStore } from "next/cache";
 import CountUp from "@/components/CountUp";
-import { getPublicSupabaseEnv } from "@/lib/supabase-config";
+import { getServiceSupabaseEnv } from "@/lib/supabase-config";
+import { supabaseService } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const supabaseEnv = getPublicSupabaseEnv();
+  noStore();
+
+  const supabaseEnv = getServiceSupabaseEnv();
   if (!supabaseEnv) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
         <div className="max-w-lg rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-900 shadow-sm">
           <h1 className="text-xl font-bold">ระบบยังเชื่อมต่อฐานข้อมูลไม่สำเร็จ</h1>
           <p className="mt-2 text-sm leading-6 text-amber-800">
-            กรุณาตั้งค่า Supabase environment variables ให้ครบก่อนใช้งานหน้านี้
+            กรุณาตั้งค่า Supabase server environment variables ให้ครบก่อนใช้งานหน้านี้
           </p>
         </div>
       </div>
     );
   }
 
-  const supabase = createClient(supabaseEnv.url, supabaseEnv.anonKey);
+  const supabase = supabaseService();
 
   const [{ data: settings }, { data: donations }] = await Promise.all([
     supabase.from("settings").select("target_amount").eq("id", 1).single(),
@@ -32,8 +35,7 @@ export default async function HomePage() {
       .eq("verified", true)
       .eq("publish", true)
       .eq("status", "approved")
-      .order("created_at", { ascending: false })
-      .limit(50),
+      .order("created_at", { ascending: false }),
   ]);
 
   const target = Number(settings?.target_amount ?? process.env.DEFAULT_TARGET_AMOUNT ?? 500000);
