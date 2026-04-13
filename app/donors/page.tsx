@@ -3,6 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import { getPublicSupabaseEnv } from "@/lib/supabase-config";
 
+export const dynamic = "force-dynamic";
+
 export default async function DonorsPage() {
   const supabaseEnv = getPublicSupabaseEnv();
   if (!supabaseEnv) {

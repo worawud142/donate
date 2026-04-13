@@ -5,6 +5,8 @@ import Image from "next/image";
 import CountUp from "@/components/CountUp";
 import { getPublicSupabaseEnv } from "@/lib/supabase-config";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const supabaseEnv = getPublicSupabaseEnv();
   if (!supabaseEnv) {

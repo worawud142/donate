@@ -3,6 +3,8 @@ import BoardDisplay from "@/app/board/BoardDisplay";
 import { supabaseService } from "@/lib/supabase-server";
 import { getServiceSupabaseEnv } from "@/lib/supabase-config";
 
+export const dynamic = "force-dynamic";
+
 type BoardPageProps = {
   searchParams?: Promise<{
     view?: string;
