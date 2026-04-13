@@ -173,7 +173,7 @@ export default function AdminPage() {
       prev.map((item) => {
         if (item.id !== body.id) return item;
         if (path.endsWith("/approve")) {
-          return { ...item, verified: true, status: "approved" };
+          return { ...item, verified: true, status: "approved", publish: true };
         }
         if (path.endsWith("/reject")) {
           return { ...item, verified: false, status: "rejected" };

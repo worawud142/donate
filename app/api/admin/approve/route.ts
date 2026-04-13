@@ -15,7 +15,12 @@ export async function POST(req: Request) {
 
   const { data, error } = await guard.supabase
     .from("donations")
-    .update({ verified: true, status: "approved", updated_at: new Date().toISOString() })
+    .update({
+      verified: true,
+      publish: true,
+      status: "approved",
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", id)
     .select("*")
     .single();
